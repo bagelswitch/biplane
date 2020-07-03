@@ -6,7 +6,7 @@ BombXMinHigh           = 0     ; 0*256 + 0 = 0  minX
 BombXMinLow            = 0
 BombXMaxHigh           = 1     ; 1*256 + 255 = 511 maxX
 BombXMaxLow            = 255
-BombYMin               = 40
+BombYMin               = 30
 BombYMax               = 209
 BombInputDelay         = 10
 
@@ -223,6 +223,12 @@ gameBombUpdateCollisions
         cmp #13
         bcc @gBUCNoCollision
 
+
+        ; if we're above the vertical display area, no collision
+        lda bombY
+        cmp #40
+        bcc @gBUCNoCollision
+
         ; if we have hit a non-terrain background character, no collision
         LIBSCREEN_BACKGROUND_CHECK bombXChar, bombYChar
         cmp #0
@@ -392,7 +398,7 @@ gBoEndmove
         jsr gameBombSetSpritePosition
 
         ; update the bomb's char positions
-        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA bombXHigh, bombXLow, 12, bombY, 40, bombXChar, bombXOffset, bombYChar, bombYOffset
+        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA bombXHigh, bombXLow, 24, bombY, 36, bombXChar, bombXOffset, bombYChar, bombYOffset
 
         rts
 

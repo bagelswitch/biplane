@@ -6,7 +6,7 @@ PlayerXMinHigh          = 0     ; 0*256 + 24 = 24  minX
 PlayerXMinLow           = 24
 PlayerXMaxHigh          = 1     ; 1*256 + 64 = 320 maxX
 PlayerXMaxLow           = 64
-PlayerYMin              = 50
+PlayerYMin              = 30
 PlayerYMax              = 229
 PlayerInputDelay        = 3
 PlayerXMinScrollHigh    = 0     ; 0*256 + 150 = 150  minX
@@ -201,6 +201,11 @@ gamePlayerUpdateCollisions
         cmp #13
         bcc @gPUCNoCollision
 
+        ; if we're above the vertical display area, no collision
+        lda playerY
+        cmp #40
+        bcc @gPUCNoCollision
+
         ; if we have hit a non-terrain background character, no collision
         LIBSCREEN_BACKGROUND_CHECK playerXChar, playerYChar
         cmp #0
@@ -343,7 +348,7 @@ doneMove
         LIBSPRITE_SETPOSITION_AAA playerSprite, PlayerXLow, PlayerY
 
         ; update the player char positions
-        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA playerXHigh, playerXLow, 12, playerY, 40, playerXChar, playerXOffset, playerYChar, playerYOffset
+        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA playerXHigh, playerXLow, 16, playerY, 40, playerXChar, playerXOffset, playerYChar, playerYOffset
 
         ;LIBSCREEN_DEBUG8BIT_VVA 80, 80, playerDelayCounter
 

@@ -421,11 +421,11 @@ gameBullets_Collided
 @yplus1
         ; skip if currentbullet YChar+1 != YChar
         ;iny
-        iny
-        cpy bulletsYCharCol
-        bne @doneYCheck
-        lda #1
-        sta bulletsYFlag
+        ;iny
+        ;cpy bulletsYCharCol
+        ;bne @doneYCheck
+        ;lda #1
+        ;sta bulletsYFlag
 
 @doneYCheck
         lda bulletsYFlag
@@ -453,11 +453,11 @@ gameBullets_Collided
 @xplus1
         ; skip if currentbullet XChar+1 != XChar
         ;iny
-        iny
-        cpy bulletsXCharCol
-        bne @doneXCheck
-        lda #1
-        sta bulletsXFlag
+        ;iny
+        ;cpy bulletsXCharCol
+        ;bne @doneXCheck
+        ;lda #1
+        ;sta bulletsXFlag
 
 @doneXCheck
         lda bulletsXFlag

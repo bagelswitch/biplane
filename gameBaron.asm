@@ -169,6 +169,11 @@ gameBaronUpdateCollisions
         cmp #13
         bcc @gBUCNoCollision
 
+        ; if we're above the vertical display area, no collision
+        lda baronY
+        cmp #40
+        bcc @gBUCNoCollision
+
         ; if we have hit a non-terrain background character, no collision
         LIBSCREEN_BACKGROUND_CHECK baronXChar, baronYChar
         cmp #0
@@ -364,7 +369,7 @@ gBEndmove
         LIBSPRITE_SETPOSITION_AAAA baronSprite, baronXHigh, baronXLow, baronY
 
         ; update the baron's char positions
-        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA baronXHigh, baronXLow, 12, baronY, 40, baronXChar, baronXOffset, baronYChar, baronYOffset
+        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA baronXHigh, baronXLow, 16, baronY, 40, baronXChar, baronXOffset, baronYChar, baronYOffset
 
         rts
 
