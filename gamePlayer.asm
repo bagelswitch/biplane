@@ -211,6 +211,9 @@ gamePlayerUpdateCollisions
         cmp #0
         beq @gPUCNoCollision
 
+        ; background collision, blow up!
+        jsr gameBombPlayerDeathBomb
+
 @gPUCcollision
         lda #False
         sta playerActive
@@ -311,7 +314,7 @@ keyDown
         sta playerHorizontalBombSpeed
         lda playerYbombArray,x
         sta playerVerticalBombSpeed
-        GAMEBOMB_DROPBOMB playerFrame, playerY, playerXHigh, playerXLow, playerVerticalBombSpeed, playerHorizontalBombSpeed
+        GAMEBOMB_DROPBOMB_AAAAAA playerFrame, playerY, playerXHigh, playerXLow, playerVerticalBombSpeed, playerHorizontalBombSpeed
 
 gPUPEndmove
         ldx playerFrame

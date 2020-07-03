@@ -36,7 +36,47 @@ bombSpriteFrameConv   byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  4
 ;===============================================================================
 ; Macros/Subroutines
 
-defm    GAMEBOMB_DROPBOMB 
+gameBombPlayerDeathBomb
+
+        GAMEBOMB_DROPBOMB_AAAAVV playerFrame, playerY, playerXHigh, playerXLow, -2, 0
+        rts
+
+defm    GAMEBOMB_DROPBOMB_AAAAVV
+                        ; /1 = initial frame/orientation
+                        ; /2 = initial Y position
+                        ; /3 = initial X position high byte
+                        ; /4 = initial X position low byte
+                        ; /5 = initial vertical speed
+                        ; /6 = initial horizontal speed
+
+        lda bombActive ; only one bomb at a time
+        bne @noDrop
+
+        lda /1
+        sta bombFrame
+
+        lda /2
+        sta bombY
+
+        lda /3
+        sta bombXHigh
+
+        lda /4
+        sta bombXLow
+
+        lda #/5
+        sta bombVerticalSpeed
+
+        lda #/6
+        sta bombHorizontalSpeed
+
+        jsr gameBombInit
+
+@noDrop
+
+        endm
+
+defm    GAMEBOMB_DROPBOMB_AAAAAA
                         ; /1 = initial frame/orientation
                         ; /2 = initial Y position
                         ; /3 = initial X position high byte
@@ -152,6 +192,9 @@ gameBombDestroyBackground
 
 @centerImpactTarget
         GAMEMAP_SETCHAR_V #12
+        inc bombYChar
+        jsr gameBombDestroyBackground
+        dec bombYChar
         jmp @leftImpact
 
 @centerImpactLandscape
@@ -170,6 +213,11 @@ gameBombDestroyBackground
 
 @leftImpactTarget
         GAMEMAP_SETCHAR_V #12
+        inc bombYChar
+        dec bombXChar
+        jsr gameBombDestroyBackground
+        dec bombYChar
+        inc bombXChar
         jmp @rightImpact
 
 @leftImpactLandscape
@@ -189,6 +237,11 @@ gameBombDestroyBackground
 
 @rightImpactTarget
         GAMEMAP_SETCHAR_V #12
+        inc bombYChar
+        inc bombXChar
+        jsr gameBombDestroyBackground
+        dec bombYChar
+        dec bombXChar
         jmp @doneImpact
 
 @rightImpactLandscape
@@ -398,7 +451,7 @@ gBoEndmove
         jsr gameBombSetSpritePosition
 
         ; update the bomb's char positions
-        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA bombXHigh, bombXLow, 24, bombY, 36, bombXChar, bombXOffset, bombYChar, bombYOffset
+        LIBSCREEN_PIXELTOCHAR_AAVAVAAAA bombXHigh, bombXLow, 24, bombY, 40, bombXChar, bombXOffset, bombYChar, bombYOffset
 
         rts
 
