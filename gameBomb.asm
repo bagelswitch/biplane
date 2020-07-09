@@ -38,7 +38,7 @@ bombSpriteFrameConv   byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  4
 
 gameBombPlayerDeathBomb
 
-        GAMEBOMB_DROPBOMB_AAAAVV playerFrame, playerY, playerXHigh, playerXLow, -2, 0
+        GAMEBOMB_DROPBOMB_AAAAVV playerFrame, playerY, playerXHigh, playerXLow, -1, 0
         rts
 
 defm    GAMEBOMB_DROPBOMB_AAAAVV

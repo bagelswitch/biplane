@@ -50,13 +50,14 @@ baronXmoveArrayScrollRight  byte    2,  3,  3,  4,  4,  4,  5,  4,  4,  4,  3,  
 baronYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
                         byte    3,  2,  2,  2,  1,   1,  0, -1, -1, -2, -2, -2
 
-                        ; bullet directions by sprite frame
-baronXbulletArray      byte    0,  0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0
-                        byte    0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0
 
                         ; bullet directions by sprite frame
-baronYbulletArray      byte   -1, -1, -1, -1, -1,  0,  0,  0,  1,  1,  1,  1
-                        byte    1,  1,  1,  1,  1,  0,  0,  0, -1, -1, -1, -1
+baronXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
+                       byte    0, -1, -2, -3, -4, -5, -6, -5, -4, -3, -2, -1
+
+                        ; bullet directions by sprite frame
+baronYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
+                       byte    6,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5
 
 ;===============================================================================
 ; Macros/Subroutines
@@ -140,7 +141,7 @@ gameBaronUpdateFiring
         lda baronIsFiring
         cmp #1
         bne gBNoFire
-        GAMEBULLETS_FIRE_AAAVAAA baronXChar, baronXOffset, baronYChar, Black, baronVerticalBulletSpeed, baronHorizontalBulletSpeed, baronSprite
+        GAMEBULLETS_FIRE_AAAVAAA baronXHigh, baronXLow, baronY, Black, baronHorizontalBulletSpeed, baronVerticalBulletSpeed, baronSprite
 gBNoFire
 
         rts

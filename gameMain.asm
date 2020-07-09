@@ -75,9 +75,12 @@
         sta $0315
         lda #%00000001
         sta $D01A
-        
+       
         ; initialize the music
         jsr libMusicInit
+ 
+        ; initialize the sound
+        jsr libSoundInit
 
         ; Initialize the game
         jsr gamePlayerInit
@@ -148,8 +151,8 @@ Irq     ; fires at raster line 0
         lda #15
         sta EXTCOL
 
-        ; play a music frame only if the baron is not alive
-        lda baronActive
+        ; play a music frame only if the player is not alive
+        lda playerActive
         bne @skipMusic
         jsr libMusicUpdate
 

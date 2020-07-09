@@ -9,6 +9,7 @@ PlayerXMaxLow           = 64
 PlayerYMin              = 30
 PlayerYMax              = 229
 PlayerInputDelay        = 3
+PlayerFireDelay         = 1
 PlayerXMinScrollHigh    = 0     ; 0*256 + 150 = 150  minX
 PlayerXMinScrollLow     = 170
 PlayerXMaxScrollHigh    = 0     ; 0*256 + 190 = 190 maxX
@@ -48,12 +49,12 @@ playerYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
                         byte    3,  2,  2,  2,  1,   1,  0, -1, -1, -2, -2, -2
 
                         ; bullet directions by sprite frame
-playerXbulletArray      byte    0,  0,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0
-                        byte    0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0
+playerXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
+                        byte    0, -1, -2, -3, -4, -5, -6, -5, -4, -3, -2, -1
 
                         ; bullet directions by sprite frame
-playerYbulletArray      byte   -1, -1, -1, -1, -1,  0,  0,  0,  1,  1,  1,  1
-                        byte    1,  1,  1,  1,  1,  0,  0,  0, -1, -1, -1, -1
+playerYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
+                        byte    6,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5
 
                         ; horizontal velocities by sprite frame
 playerXbombArray        byte    0,  1,  1,  2,  2,  2,  2,  2,  2,  2,  1,  1
@@ -104,6 +105,7 @@ gamePlayerInit
 
         lda #0
         sta playerDelayCounter
+        sta playerFireCounter
 
         rts
 
@@ -155,24 +157,28 @@ gamePlayerUpdateFiring
         LIBINPUT_GETFIREPRESSED
         beq @firing
         jmp gPUFNofire
+
 @firing
         lda playerActive
         bne playerCharActive
-        INCREMENT_INPUT_DELAY_AA playerDelayCounter, gPUFNofire
+        ; bring the player back to life
+        INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         jsr gamePlayerReset
         jmp gPUFNofire
 
 playerCharActive
         lda baronActive
         bne baronCharActive
-        INCREMENT_INPUT_DELAY_AA playerDelayCounter, gPUFNofire
+        ; summon the baron
+        INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         jsr gameBaronReset
 
 baronCharActive
-        ; play firing sound
+        ; play firing sound and fire a bullet
+        INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
+        GAMEBULLETS_FIRE_AAAVAAA playerXHigh, playerXLow, playerY, Black, playerHorizontalBulletSpeed, playerVerticalBulletSpeed, playerSprite
 
-        GAMEBULLETS_FIRE_AAAVAAA playerXChar, playerXOffset, playerYChar, Black, playerVerticalBulletSpeed, playerHorizontalBulletSpeed, playerSprite
 gPUFNofire
 
         rts
@@ -237,6 +243,24 @@ defm INCREMENT_INPUT_DELAY_AA ; /1 = Current delay counter
         ldx /1
         inx
         cpx #PlayerInputDelay
+        bcc @endDelay
+        lda #0
+        sta /1
+        jmp @finished
+@endDelay
+        stx /1
+        jmp /2
+@finished
+
+        endm
+
+;===============================================================================
+
+defm INCREMENT_FIRE_DELAY_AA ; /1 = Current delay counter
+        
+        ldx /1
+        inx
+        cpx #PlayerFireDelay
         bcc @endDelay
         lda #0
         sta /1
@@ -326,13 +350,13 @@ gPUPEndmove
 
         ; apply horizontal velocity
         cpx #13
-        bcs leftMove
-rightMove
+        bcs @leftMove
+@rightMove
         LIBMATH_ADD16BIT_AAVAAA playerXHigh, PlayerXLow, 0, playerHorizontalSpeed, playerXHigh, PlayerXLow
-        jmp doneMove
-leftMove
+        jmp @doneMove
+@leftMove
         LIBMATH_SUB16BIT_AAVAAA playerXHigh, PlayerXLow, 0, playerHorizontalSpeed, playerXHigh, PlayerXLow
-doneMove
+@doneMove
 
         ; apply vertical velocity
         LIBMATH_ADD8BIT_AAA PlayerY, playerVerticalSpeed, PlayerY 

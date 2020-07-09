@@ -8,6 +8,7 @@ ZeroPageTemp2   = $03
 
 baronDelayCounter  = $04
 playerDelayCounter = $05
+playerFireCounter  = $0D
 bombDelayCounter   = $09
 baronIsFiring      = $06
 

@@ -432,6 +432,37 @@ defm    LIBSCREEN_GETCHAR  ; /1 = Return character code (Address)
 
 ;===============================================================================
 
+defm    LIBSCREEN_PIXELTOCHAR_AAVAVAA
+                                ; /1 = XHighPixels      (Address)
+                                ; /2 = XLowPixels       (Address)
+                                ; /3 = XAdjust          (Value)
+                                ; /4 = YPixels          (Address)
+                                ; /5 = YAdjust          (Value)
+                                ; /6 = XChar            (Address)
+                                ; /7 = YChar            (Address)
+                                
+
+        lda /1
+        sta ZeroPageParam1
+        lda /2
+        sta ZeroPageParam2
+        lda #/3
+        sta ZeroPageParam3
+        lda /4
+        sta ZeroPageParam4
+        lda #/5
+        sta ZeroPageParam5
+        
+        jsr libScreen_PixelToChar
+
+        lda ZeroPageParam6
+        sta /6
+        lda ZeroPageParam8
+        sta /7
+
+        endm
+
+
 defm    LIBSCREEN_PIXELTOCHAR_AAVAVAAAA
                                 ; /1 = XHighPixels      (Address)
                                 ; /2 = XLowPixels       (Address)

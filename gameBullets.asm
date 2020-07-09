@@ -3,23 +3,23 @@
 ;===============================================================================
 ; Constants
 
-BulletsMax = 10
+BulletsMax = 6
 Bullet1stCharacter = 123
 Temp1stCharacter = 245
-BulletMaxLife = 15
+BulletMaxLife = 50
 
 ;===============================================================================
 ; Variables
 
-bulletsXHigh    byte 0
-bulletsXLow     byte 0     
-bulletsY        byte 0
+bulletsXHighCurrent     byte 0
+bulletsXLowCurrent      byte 0
+bulletsYCurrent         byte 0
 bulletsXCharCurrent     byte 0
 bulletsXOffsetCurrent   byte 0
 bulletsYCharCurrent     byte 0
 bulletsColorCurrent     byte 0
-bulletsDirXCurrent      byte 0
-bulletsDirYCurrent      byte 0
+bulletsVelXCurrent      byte 0
+bulletsVelYCurrent      byte 0
 bulletsOldCharCurrent   byte 0
 bulletsOldColorCurrent  byte 0
 bulletsOldToggleCurrent byte 0
@@ -32,10 +32,13 @@ bulletsActive    dcb BulletsMax, 0
 bulletsSource    dcb BulletsMax, 255
 bulletsXChar     dcb BulletsMax, 0
 bulletsYChar     dcb BulletsMax, 0
+bulletsXHigh     dcb BulletsMax, 0
+bulletsXLow      dcb BulletsMax, 0
+bulletsY         dcb BulletsMax, 0
 bulletsXOffset   dcb BulletsMax, 0
 bulletsColor     dcb BulletsMax, 0
-bulletsDirX      dcb BulletsMax, 0
-bulletsDirY      dcb BulletsMax, 0
+bulletsVelX      dcb BulletsMax, 0
+bulletsVelY      dcb BulletsMax, 0
 bulletsOldChar   dcb BulletsMax, 0
 bulletsOldColor  dcb BulletsMax, 0
 bulletsOldToggle dcb BulletsMax, 0
@@ -51,12 +54,12 @@ bulletsSourceCheck byte 0
 ;===============================================================================
 ; Macros/Subroutines
 
-defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = XChar            (Address)
-                                  ; /2 = XOffset          (Address)
-                                  ; /3 = YChar            (Address)
-                                  ; /4 = Color            (Value)
-                                  ; /5 = Direction (True-Up, False-Down) (Address)
-                                  ; /6 = Direction (True-Left, False-Right) (Address)
+defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = X position high byte(Address)
+                                  ; /2 = X position low byte (Address)
+                                  ; /3 = Y position          (Address)
+                                  ; /4 = Color               (Value)
+                                  ; /5 = X velocity
+                                  ; /6 = Y velocity
                                   ; /7 = Source Sprite    (Address)
         ldx #0
 @loop
@@ -67,16 +70,17 @@ defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = XChar            (Address)
         lda #1
         sta bulletsActive,X
         lda /1
-        sta bulletsXChar,X
-
+        sta bulletsXHigh,X
+        lda /2
+        sta bulletsXLow,X
         lda /3
-        sta bulletsYChar,X
+        sta bulletsY,X
         lda #/4
         sta bulletsColor,X
         lda /5
-        sta bulletsDirY,X
+        sta bulletsVelX,X
         lda /6
-        sta bulletsDirX,X
+        sta bulletsVelY,X
         lda /7
         sta bulletsSource,X
 
@@ -97,6 +101,9 @@ defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = XChar            (Address)
         cpx #BulletsMax
         bne @loop
 @found
+
+        stx screenDebugZero
+
         endm
 
 ;===============================================================================
@@ -104,28 +111,39 @@ defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = XChar            (Address)
 gameBulletsFireGet
         lda bulletsLifetime,X
         sta bulletLifetimeCurrent
-        lda bulletsXChar,X
-        sta bulletsXCharCurrent
-        lda bulletsYChar,X
-        sta bulletsYCharCurrent
+        lda bulletsXHigh,X
+        sta bulletsXHighCurrent
+        lda bulletsXLow,X
+        sta bulletsXLowCurrent
+        lda bulletsY,X
+        sta bulletsYCurrent
         lda bulletsOldChar,X
         sta bulletsOldCharCurrent
+
+        LIBSCREEN_PIXELTOCHAR_AAVAVAA bulletsXHighCurrent, bulletsXLowCurrent, 16, bulletsYCurrent, 40, bulletsXCharCurrent, bulletsYCharCurrent
+
+        lda bulletsXCharCurrent
+        sta bulletsXChar,X
+        lda bulletsYCharCurrent
+        sta bulletsYChar,X
 
         rts
 
 gameBulletsGet
         lda bulletsLifetime,X
         sta bulletLifetimeCurrent
-        lda bulletsXChar,X
-        sta bulletsXCharCurrent
-        lda bulletsYChar,X
-        sta bulletsYCharCurrent
+        lda bulletsXHigh,X
+        sta bulletsXHighCurrent
+        lda bulletsXLow,X
+        sta bulletsXLowCurrent
+        lda bulletsY,X
+        sta bulletsYCurrent
         ;lda bulletsColor,X
         ;sta bulletsColorCurrent
-        lda bulletsDirX,X
-        sta bulletsDirXCurrent
-        lda bulletsDirY,X
-        sta bulletsDirYCurrent
+        lda bulletsVelX,X
+        sta bulletsVelXCurrent
+        lda bulletsVelY,X
+        sta bulletsVelYCurrent
         lda bulletsOldChar,X
         sta bulletsOldCharCurrent
         ;lda bulletsOldColor,X
@@ -133,6 +151,11 @@ gameBulletsGet
         lda bulletsOldToggle,X
         sta bulletsOldToggleCurrent
         stx bulletIndexCurrent
+
+        lda bulletsXChar,X
+        sta bulletsXCharCurrent
+        lda bulletsYChar,X
+        sta bulletsYCharCurrent
 
         rts
 
@@ -194,28 +217,46 @@ buok
         jsr gameBulletsGet
         jsr gameBulletsRestore
 
-        lda bulletLifetimeCurrent
-        cmp #BulletMaxLife
-        beq @deadBullet
-        inc bulletsLifetime,X
-
+        ; apply vertical velocity
         clc
+        lda bulletsYCurrent
+        adc bulletsVelYCurrent
+        sta bulletsYCurrent
+        sta bulletsY,X
+        
+        ; apply horizontal velocity
+        lda bulletsVelXCurrent 
+        cmp #0
+        bcc @leftMove
+@rightMove
+        LIBMATH_ADD16BIT_AAVAAA bulletsXHighCurrent, BulletsXLowCurrent, 0, bulletsVelXCurrent, bulletsXHighCurrent, BulletsXLowCurrent
+        jmp @doneMove
+@leftMove
+        LIBMATH_SUB16BIT_AAVAAA bulletsXHighCurrent, BulletsXLowCurrent, 0, bulletsVelXCurrent, bulletsXHighCurrent, BulletsXLowCurrent
+@doneMove
+        lda bulletsXHighCurrent
+        sta bulletsXHigh,X
+        lda bulletsXLowCurrent
+        sta bulletsXLow,X
+
+        LIBSCREEN_PIXELTOCHAR_AAVAVAA bulletsXHighCurrent, bulletsXLowCurrent, 16, bulletsYCurrent, 40, bulletsXCharCurrent, bulletsYCharCurrent
+
         lda bulletsYCharCurrent
-        adc bulletsDirYCurrent
-        sta bulletsYCharCurrent
         cmp #1
         bcc @deadBullet
         cmp #22
         bcs @deadBullet
 
-        clc
         lda bulletsXCharCurrent
-        adc bulletsDirXCurrent
-        sta bulletsXCharCurrent
         cmp #1
         bcc @deadBullet
         cmp #39
         bcs @deadBullet
+
+        lda bulletLifetimeCurrent
+        cmp #BulletMaxLife
+        beq @deadBullet
+        inc bulletsLifetime,X
 
         jmp @dirdone
 
@@ -468,6 +509,8 @@ gameBullets_Collided
         sta bulletsActive,X ; disable bullet
 
         jsr gameBulletsGet
+
+        ; why is this here?
         jsr gameBulletsRestore
 
         lda #1 ; set as collided
