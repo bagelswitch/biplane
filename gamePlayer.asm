@@ -50,7 +50,7 @@ playerYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
 
                         ; bullet directions by sprite frame
 playerXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
-                        byte    0, -1, -2, -3, -4, -5, -6, -5, -4, -3, -2, -1
+                        byte    0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1
 
                         ; bullet directions by sprite frame
 playerYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
@@ -70,6 +70,9 @@ playerYbombArray        byte   -4, -4, -3, -2, -1,  0,  0,  1,  1,  2,  2,  2
 ; Macros/Subroutines
 
 gamePlayerInit
+
+        ; re-initialize the music
+        jsr libMusicInit
 
         lda #True
         sta playerActive
@@ -177,7 +180,7 @@ baronCharActive
         ; play firing sound and fire a bullet
         INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
-        GAMEBULLETS_FIRE_AAAVAAA playerXHigh, playerXLow, playerY, Black, playerHorizontalBulletSpeed, playerVerticalBulletSpeed, playerSprite
+        GAMEBULLETS_FIRE_AAAVAAAA playerXHigh, playerXLow, playerY, Black, playerHorizontalBulletSpeed, playerVerticalBulletSpeed, playerSprite, playerFrame
 
 gPUFNofire
 

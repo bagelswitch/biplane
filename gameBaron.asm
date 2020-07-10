@@ -53,7 +53,7 @@ baronYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
 
                         ; bullet directions by sprite frame
 baronXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
-                       byte    0, -1, -2, -3, -4, -5, -6, -5, -4, -3, -2, -1
+                       byte    0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1
 
                         ; bullet directions by sprite frame
 baronYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
@@ -104,9 +104,6 @@ gameBaronReset
 
         ;inc screenDebugZero
 
-        ; re-initialize the music
-        jsr libMusicInit
-
         jsr gameBaronInit
 
         inc EXTCOL
@@ -141,7 +138,7 @@ gameBaronUpdateFiring
         lda baronIsFiring
         cmp #1
         bne gBNoFire
-        GAMEBULLETS_FIRE_AAAVAAA baronXHigh, baronXLow, baronY, Black, baronHorizontalBulletSpeed, baronVerticalBulletSpeed, baronSprite
+        GAMEBULLETS_FIRE_AAAVAAAA baronXHigh, baronXLow, baronY, Black, baronHorizontalBulletSpeed, baronVerticalBulletSpeed, baronSprite, baronFrame
 gBNoFire
 
         rts

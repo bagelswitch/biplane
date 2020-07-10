@@ -28,6 +28,7 @@ bulletDestCharCurrent   byte 0
 bulletSourceCharCurrent byte 0
 bulletLifetimeCurrent   byte 0
 
+bulletsSpriteFrame dcb BulletsMax, 0
 bulletsActive    dcb BulletsMax, 0
 bulletsSource    dcb BulletsMax, 255
 bulletsXChar     dcb BulletsMax, 0
@@ -54,13 +55,14 @@ bulletsSourceCheck byte 0
 ;===============================================================================
 ; Macros/Subroutines
 
-defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = X position high byte(Address)
+defm    GAMEBULLETS_FIRE_AAAVAAAA  ; /1 = X position high byte(Address)
                                   ; /2 = X position low byte (Address)
                                   ; /3 = Y position          (Address)
                                   ; /4 = Color               (Value)
                                   ; /5 = X velocity
                                   ; /6 = Y velocity
-                                  ; /7 = Source Sprite    (Address)
+                                  ; /7 = Source Sprite       (Address)
+                                  ; /8 = Sprite Frame        (Address)
         ldx #0
 @loop
         lda bulletsActive,X
@@ -83,6 +85,8 @@ defm    GAMEBULLETS_FIRE_AAAVAAA  ; /1 = X position high byte(Address)
         sta bulletsVelY,X
         lda /7
         sta bulletsSource,X
+        lda /8
+        sta bulletsSpriteFrame,X
 
         lda #0
         ;sta bulletsOldChar,X
@@ -225,9 +229,9 @@ buok
         sta bulletsY,X
         
         ; apply horizontal velocity
-        lda bulletsVelXCurrent 
-        cmp #0
-        bcc @leftMove
+        lda bulletsSpriteFrame,X
+        cmp #13
+        bcs @leftMove
 @rightMove
         LIBMATH_ADD16BIT_AAVAAA bulletsXHighCurrent, BulletsXLowCurrent, 0, bulletsVelXCurrent, bulletsXHighCurrent, BulletsXLowCurrent
         jmp @doneMove
