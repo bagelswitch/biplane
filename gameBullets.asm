@@ -15,18 +15,18 @@ bulletsXHighCurrent     byte 0
 bulletsXLowCurrent      byte 0
 bulletsYCurrent         byte 0
 bulletsXCharCurrent     byte 0
-bulletsXOffsetCurrent   byte 0
+;bulletsXOffsetCurrent   byte 0
 bulletsYCharCurrent     byte 0
-bulletsColorCurrent     byte 0
+;bulletsColorCurrent     byte 0
 bulletsVelXCurrent      byte 0
-bulletsVelYCurrent      byte 0
+;bulletsVelYCurrent      byte 0
 bulletsOldCharCurrent   byte 0
-bulletsOldColorCurrent  byte 0
-bulletsOldToggleCurrent byte 0
-bulletIndexCurrent      byte 0
+;bulletsOldColorCurrent  byte 0
+;bulletsOldToggleCurrent byte 0
+;bulletIndexCurrent      byte 0
 bulletDestCharCurrent   byte 0
 bulletSourceCharCurrent byte 0
-bulletLifetimeCurrent   byte 0
+;bulletLifetimeCurrent   byte 0
 
 bulletsSpriteFrame dcb BulletsMax, 0
 bulletsActive    dcb BulletsMax, 0
@@ -37,11 +37,11 @@ bulletsXHigh     dcb BulletsMax, 0
 bulletsXLow      dcb BulletsMax, 0
 bulletsY         dcb BulletsMax, 0
 bulletsXOffset   dcb BulletsMax, 0
-bulletsColor     dcb BulletsMax, 0
+;bulletsColor     dcb BulletsMax, 0
 bulletsVelX      dcb BulletsMax, 0
 bulletsVelY      dcb BulletsMax, 0
 bulletsOldChar   dcb BulletsMax, 0
-bulletsOldColor  dcb BulletsMax, 0
+;bulletsOldColor  dcb BulletsMax, 0
 bulletsOldToggle dcb BulletsMax, 0
 bulletsLifetime  dcb BulletsMax, 0
 bulletsXFlag     byte 0
@@ -77,8 +77,8 @@ defm    GAMEBULLETS_FIRE_AAAVAAAA  ; /1 = X position high byte(Address)
         sta bulletsXLow,X
         lda /3
         sta bulletsY,X
-        lda #/4
-        sta bulletsColor,X
+        ;lda #/4
+        ;sta bulletsColor,X
         lda /5
         sta bulletsVelX,X
         lda /6
@@ -90,8 +90,7 @@ defm    GAMEBULLETS_FIRE_AAAVAAAA  ; /1 = X position high byte(Address)
 
         lda #0
         ;sta bulletsOldChar,X
-        sta bulletsOldColor,X
-
+        ;sta bulletsOldColor,X
         sta bulletsLifetime,X
 
         jsr gameBulletsFireGet
@@ -113,8 +112,8 @@ defm    GAMEBULLETS_FIRE_AAAVAAAA  ; /1 = X position high byte(Address)
 ;===============================================================================
 
 gameBulletsFireGet
-        lda bulletsLifetime,X
-        sta bulletLifetimeCurrent
+        ;lda bulletsLifetime,X
+        ;sta bulletLifetimeCurrent
         lda bulletsXHigh,X
         sta bulletsXHighCurrent
         lda bulletsXLow,X
@@ -134,8 +133,8 @@ gameBulletsFireGet
         rts
 
 gameBulletsGet
-        lda bulletsLifetime,X
-        sta bulletLifetimeCurrent
+        ;lda bulletsLifetime,X
+        ;sta bulletLifetimeCurrent
         lda bulletsXHigh,X
         sta bulletsXHighCurrent
         lda bulletsXLow,X
@@ -146,15 +145,15 @@ gameBulletsGet
         ;sta bulletsColorCurrent
         lda bulletsVelX,X
         sta bulletsVelXCurrent
-        lda bulletsVelY,X
-        sta bulletsVelYCurrent
+        ;lda bulletsVelY,X
+        ;sta bulletsVelYCurrent
         lda bulletsOldChar,X
         sta bulletsOldCharCurrent
         ;lda bulletsOldColor,X
         ;sta bulletsOldColorCurrent
-        lda bulletsOldToggle,X
-        sta bulletsOldToggleCurrent
-        stx bulletIndexCurrent
+        ;lda bulletsOldToggle,X
+        ;sta bulletsOldToggleCurrent
+        ;stx bulletIndexCurrent
 
         lda bulletsXChar,X
         sta bulletsXCharCurrent
@@ -224,7 +223,7 @@ buok
         ; apply vertical velocity
         clc
         lda bulletsYCurrent
-        adc bulletsVelYCurrent
+        adc bulletsVelY,X
         sta bulletsYCurrent
         sta bulletsY,X
         
@@ -257,7 +256,7 @@ buok
         cmp #39
         bcs @deadBullet
 
-        lda bulletLifetimeCurrent
+        lda bulletsLifetime,X
         cmp #BulletMaxLife
         beq @deadBullet
         inc bulletsLifetime,X
@@ -280,8 +279,8 @@ buok
         
         ; set the bullet character
         clc
-        lda #Temp1stCharacter
-        adc bulletIndexCurrent
+        txa
+        adc #Temp1stCharacter
         sta bulletDestCharCurrent
 
         jsr gameBulletsBackup
