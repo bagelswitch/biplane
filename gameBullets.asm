@@ -6,7 +6,7 @@
 BulletsMax = 6
 Bullet1stCharacter = 123
 Temp1stCharacter = 245
-BulletMaxLife = 50
+BulletMaxLife = 25
 
 ;===============================================================================
 ; Variables
@@ -250,11 +250,11 @@ buok
         cmp #22
         bcs @deadBullet
 
-        lda bulletsXCharCurrent
-        cmp #1
-        bcc @deadBullet
-        cmp #39
-        bcs @deadBullet
+        ;lda bulletsXCharCurrent
+        ;cmp #1
+        ;bcc @deadBullet
+        ;cmp #39
+        ;bcs @deadBullet
 
         lda bulletsLifetime,X
         cmp #BulletMaxLife

@@ -108,10 +108,6 @@ gMLoop1
         sta EXTCOL
         jsr gamePlayerUpdate
 
-        lda #11
-        sta EXTCOL
-        jsr gameBaronUpdate
-
         ; End code timer reset border color
         lda #0
         sta EXTCOL
@@ -134,14 +130,33 @@ gMLoop2
 
         rts
 
-Irq     ; fires at raster line 0
-        LIBSCREEN_SETCOLORS Black, LightBlue, Brown, White, Black
-        lda #8
+gmLoop3
+
+        lda #11
         sta EXTCOL
+        jsr gameBaronUpdate
+
+        ; End code timer reset border color
+        lda #0
+        sta EXTCOL
+
+        rts
+
+Irq     ; fires at raster line 10
+        LIBSCREEN_SETCOLORS Black, LightBlue, Brown, White, Black
         LIBSCREEN_SCROLLTOBACKGROUND
+
+        lda #5
+        sta EXTCOL
+
         SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     6, 6, gameMapUpdateBottom, gameMapUpdateBottom
         ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     0, 6, gameColorUpdateBottom, gameColorUpdateBottom
         SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     0, 0, gameMapUpdateBottomExtra, gameMapUpdateBottomExtra
+
+
+        ;lda #9
+        ;sta EXTCOL
+
         SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     1, 1, gameMapUpdateTop, gameMapUpdateTop
         SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     5, 5, gameMapUpdateTop, gameMapUpdateTop
         ;SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     6, 0, gameColorUpdateTop, gameColorUpdateTop
@@ -163,6 +178,8 @@ Irq     ; fires at raster line 0
 
         lda #0
         sta EXTCOL
+
+        jsr gMLoop3
 
         lda #<Irq2
         sta $0314
@@ -196,7 +213,7 @@ Irq2    ; fires at raster line 146
 
 Irq3    ; fires at raster line 234
         LIBSCREEN_SETCOLORS Black, Red, Green, White, Red
-        lda #1
+        lda #2
         sta EXTCOL
         LIBSCREEN_SCROLLTOSCOREBOARD
 
@@ -223,7 +240,7 @@ Irq3    ; fires at raster line 234
         sta $0314
         lda #>Irq
         sta $0315
-        lda #0
+        lda #10
         sta $D012
         lsr $D019
         jmp $EA81
