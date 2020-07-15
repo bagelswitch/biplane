@@ -18,23 +18,23 @@ PlayerXMaxScrollLow     = 170
 ;===============================================================================
 ; Variables
 
-playerActive          byte 1
-playerFrame           byte 6
-playerSpriteFrame     byte 0
-playerSprite          byte 0
-playerXHigh           byte 0
-playerXLow            byte 25
-playerY               byte 55
-playerXChar           byte 0
-playerXOffset         byte 0
-playerYChar           byte 0
-playerYOffset         byte 0
-playerHorizontalSpeed byte 3
-playerVerticalSpeed   byte 0
-playerHorizontalBombSpeed byte 0
-playerVerticalBombSpeed   byte 0
-playerHorizontalBulletSpeed byte 1
-playerVerticalBulletSpeed   byte 1
+;playerActive          byte 1
+;playerFrame           byte 6
+;playerSpriteFrame     byte 0
+;playerSprite          byte 0
+;playerXHigh           byte 0
+;playerXLow            byte 25
+;playerY               byte 55
+;playerXChar           byte 0
+;playerXOffset         byte 0
+;playerYChar           byte 0
+;playerYOffset         byte 0
+;playerHorizontalSpeed byte 3
+;playerVerticalSpeed   byte 0
+;playerHorizontalBombSpeed byte 0
+;playerVerticalBombSpeed   byte 0
+;playerHorizontalBulletSpeed byte 1
+;playerVerticalBulletSpeed   byte 1
 
                         ; down-sampled animation frames to reduce sprite size
 playerSpriteFrameConv   byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  4
@@ -98,6 +98,9 @@ gamePlayerInit
         lda #1
         sta playerXChar
         
+        lda #0
+        sta playerSprite
+
         LIBSPRITE_ENABLE_AV             playerSprite, True
         ldx playerFrame
         lda playerSpriteFrameConv,x

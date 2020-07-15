@@ -20,6 +20,28 @@ screenTwoActive    = $0B
 
 backgroundWriteColumn = $0C
 
+;===============================================================================
+; use zero page for player variables to improve speed
+
+playerActive = $5D
+playerFrame = $5E
+playerSpriteFrame = $5F
+playerSprite = $60
+playerXHigh = $61
+playerXLow = $62
+playerY = $63
+playerXChar = $64
+playerXOffset = $65
+playerYChar = $66
+playerYOffset = $67
+playerHorizontalSpeed = $68
+playerVerticalSpeed = $69
+playerHorizontalBombSpeed = $6A
+playerVerticalBombSpeed = $6B
+playerHorizontalBulletSpeed = $6C
+playerVerticalBulletSpeed = $6D
+
+
                 ; using $73-$8A CHRGET as BASIC not used for our game
 ZeroPageParam1  = $73
 ZeroPageParam2  = $74
