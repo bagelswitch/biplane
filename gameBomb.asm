@@ -128,6 +128,8 @@ gameBombInit
         LIBSPRITE_SETCOLOR_AV           bombSprite, Black
         LIBSPRITE_MULTICOLORENABLE_AV   bombSprite, True
 
+        LIBSOUND_BOMB_START_VV 100, 120
+
         lda #0
         sta bombDelayCounter
 
@@ -155,6 +157,9 @@ gameBombUpdate
         inc EXTCOL
         jsr gameBombUpdateCollisions
         dec EXTCOL
+
+        LIBSOUND_BOMB_UPDATE_AA bombYChar, bombYChar
+
         jmp @updateDone
 
 @skipUpdate
@@ -276,7 +281,6 @@ gameBombUpdateCollisions
         cmp #13
         bcc @gBUCNoCollision
 
-
         ; if we're above the vertical display area, no collision
         lda bombY
         cmp #40
@@ -303,6 +307,7 @@ gameBombUpdateCollisions
         LIBSPRITE_PLAYANIM_AVVVV        bombSprite, 0, 11, 3, False
 
         ; play explosion sound
+        LIBSOUND_BOMB_STOP
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
 
         jsr gameBombDestroyBackground

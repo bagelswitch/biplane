@@ -236,7 +236,7 @@ gamePlayerUpdateCollisions
         LIBSPRITE_PLAYANIM_AVVVV        playerSprite, 0, 11, 3, False
 
         ; play explosion sound
-        LIBSOUND_PLAY_VAA 1, soundFiringHigh, soundFiringLow
+        LIBSOUND_PLAY_VAA 2, soundFiringHigh, soundFiringLow
                                 
 @gPUCNoCollision
 

@@ -1,9 +1,9 @@
 ;===============================================================================
 ; $00-$FF  PAGE ZERO (256 bytes)
  
-                ; $00-$01   Reserved for IO
+; $00-$01   Reserved for IO
 ZeroPageTemp    = $02
-                ; $03-$8F   Reserved for BASIC
+; $03-$8F   Reserved for BASIC
 ZeroPageTemp2   = $03
 
 baronDelayCounter  = $04
@@ -42,7 +42,7 @@ playerHorizontalBulletSpeed = $6C
 playerVerticalBulletSpeed = $6D
 
 
-                ; using $73-$8A CHRGET as BASIC not used for our game
+; using $73-$8A CHRGET as BASIC not used for our game
 ZeroPageParam1  = $73
 ZeroPageParam2  = $74
 ZeroPageParam3  = $75
@@ -60,13 +60,13 @@ ZeroPageLow3    = $8B
 ZeroPageHigh3   = $8C
 
 ScreenScrolling = $8E
-                ; $90-$FA   Reserved for Kernal
+; $90-$FA   Reserved for Kernal
 
 ZeroPageLow     = $FB
 ZeroPageHigh    = $FC
 ZeroPageLow2    = $FD
 ZeroPageHigh2   = $FE
-                ; $FF       Reserved for Kernal
+; $FF       Reserved for Kernal
 
 ;===============================================================================
 ; $0100-$01FF  STACK (256 bytes)
@@ -131,7 +131,7 @@ incbin farmland.out
 ;* = $9FFE
 ;incbin finalcountdown.dat
 
-* = MusicBaseAddress
+* = MusicBaseAddress ; $B000
 incbin gbluesn.dat
 
 

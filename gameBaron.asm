@@ -187,7 +187,7 @@ gameBaronUpdateCollisions
         LIBSPRITE_PLAYANIM_AVVVV        baronSprite, 0, 11, 3, False
 
         ; play explosion sound
-        LIBSOUND_PLAY_VAA 1, soundPickupHigh, soundPickupLow
+        LIBSOUND_PLAY_VAA 2, soundPickupHigh, soundPickupLow
                                 
 @gBUCNoCollision
 

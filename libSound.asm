@@ -144,7 +144,7 @@ soundPickup     byte CmdAttackDecay, Attack_2ms+Decay_6ms
                 byte CmdFrequencyHigh, 84
                 byte CmdFrequencyLow, 125
                 byte CmdWave, SawtoothStart
-                byte CmdDelay, 5
+                byte CmdDelay, 10
                 byte CmdWave, SawtoothEnd
 
                 byte CmdAttackDecay, Attack_2ms+Decay_6ms
@@ -152,7 +152,7 @@ soundPickup     byte CmdAttackDecay, Attack_2ms+Decay_6ms
                 byte CmdFrequencyHigh, 100
                 byte CmdFrequencyLow, 121
                 byte CmdWave, SawtoothStart
-                byte CmdDelay, 5
+                byte CmdDelay, 10
                 byte CmdWave, SawtoothEnd
 
                 byte CmdEnd
@@ -260,6 +260,62 @@ defm LIBSOUND_PLAY_VAA  ; /1 = Voice                   (Value)
 
         endm
 
+
+;===============================================================================
+
+defm LIBSOUND_BOMB_START_VV  ; /1 = Frequency High (Value)
+                             ; /2 = Frequency Low  (Value)
+
+        lda #150
+        sbc #/1
+        tax
+        lda #150
+        sbc #/2
+        tay
+
+        jsr libSoundBombStart
+
+        endm
+
+libSoundBombStart
+
+        stx FREHI1
+        sty FRELO1
+
+        lda #Attack_2ms+Decay_6ms
+        sta ATDCY1
+
+        lda #Sustain_Vol10+Release_300ms
+        sta SUREL1
+
+        lda #SawtoothStart
+        sta VCREG1
+
+        rts
+
+defm LIBSOUND_BOMB_UPDATE_AA  ; /1 = Frequency High (Value)
+                              ; /2 = Frequency Low  (Value)
+
+        lda #150
+        sbc /1
+        sta FREHI1
+        lda #150
+        sbc /2
+        sta FRELO1
+
+        endm
+
+defm LIBSOUND_BOMB_STOP
+           
+        jsr libSoundBombStop
+
+        endm
+
+libSoundBombStop
+        lda #SawtoothEnd
+        sta VCREG1
+
+        rts
 
 ;===============================================================================
 
