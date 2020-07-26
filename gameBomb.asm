@@ -6,8 +6,8 @@ BombXMinHigh           = 0     ; 0*256 + 0 = 0  minX
 BombXMinLow            = 0
 BombXMaxHigh           = 1     ; 1*256 + 255 = 511 maxX
 BombXMaxLow            = 255
-BombYMin               = 30
-BombYMax               = 209
+BombYMin               = 40
+BombYMax               = 220
 BombInputDelay         = 10
 
 ;===============================================================================
@@ -414,8 +414,8 @@ gameBombSetSpritePosition
         ;LIBMATH_MIN16BIT_AAVV bombXHigh, bombXLow, BombXMaxHigh, BombXMaxLow
 
         ; clamp bomb's y position
-        ;LIBMATH_MIN8BIT_AV bombY, BombYMax
-        ;LIBMATH_MAX8BIT_AV bombY, BombYMin
+        LIBMATH_MIN8BIT_AV bombY, BombYMax
+        LIBMATH_MAX8BIT_AV bombY, BombYMin
 
         ; set the sprite position
         LIBSPRITE_SETPOSITION_AAAA bombSprite, bombXHigh, bombXLow, bombY
