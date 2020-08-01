@@ -209,6 +209,9 @@ gameBombDestroyBackground
         GAMEMAP_SETCHAR_V #12
         dey
         dey
+        dec bombYChar
+        jsr gameBombDestroyBackground
+        inc bombYChar
         jmp @leftImpact
 
 @centerImpactLandscape
