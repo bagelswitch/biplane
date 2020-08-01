@@ -239,7 +239,7 @@ gameBombDestroyBackground
         GAMEMAP_GETCHAR bombImpactChar
         cmp #12
         beq @doneImpact
-        cmp #97
+        cmp #98
         bcc @rightImpactLandscape
         cmp #101
         bcs @rightImpactTarget
