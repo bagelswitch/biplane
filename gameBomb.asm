@@ -3,17 +3,17 @@
 
 BombMaxFrame           = 24
 BombXMinHigh           = 0     ; 0*256 + 0 = 0  minX
-BombXMinLow            = 0
+BombXMinLow            = 16
 BombXMaxHigh           = 1     ; 1*256 + 255 = 511 maxX
-BombXMaxLow            = 255
-BombYMin               = 40
-BombYMax               = 220
+BombXMaxLow            = 72
+BombYMin               = 30
+BombYMax               = 216
 BombInputDelay         = 10
 
 ;===============================================================================
 ; Variables
 
-bombActive           byte 1
+bombActive           byte 0
 bombFrame            byte 1
 bombSprite           byte 2
 bombSpriteFrame      byte 0
@@ -35,11 +35,6 @@ bombSpriteFrameConv   byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  4
 
 ;===============================================================================
 ; Macros/Subroutines
-
-gameBombPlayerDeathBomb
-
-        GAMEBOMB_DROPBOMB_AAAAVV playerFrame, playerY, playerXHigh, playerXLow, -1, 0
-        rts
 
 defm    GAMEBOMB_DROPBOMB_AAAAVV
                         ; /1 = initial frame/orientation
@@ -128,7 +123,7 @@ gameBombInit
         LIBSPRITE_SETCOLOR_AV           bombSprite, Black
         LIBSPRITE_MULTICOLORENABLE_AV   bombSprite, True
 
-        LIBSOUND_BOMB_START_VV 100, 120
+        LIBSOUND_BOMB_START_AA bombY, bombY
 
         lda #0
         sta bombDelayCounter
@@ -158,7 +153,7 @@ gameBombUpdate
         jsr gameBombUpdateCollisions
         dec EXTCOL
 
-        LIBSOUND_BOMB_UPDATE_AA bombYChar, bombYChar
+        LIBSOUND_BOMB_UPDATE_AA bombY, bombY
 
         jmp @updateDone
 
@@ -188,22 +183,37 @@ gameBombDestroyBackground
 @centerImpact
         GAMEMAP_GETCHAR bombImpactChar
         cmp #12
+        ; empty space
         beq @leftImpact
         cmp #98
+        ; regular terrain
         bcc @centerImpactLandscape
         cmp #101
+        ; building target
         bcs @centerImpactTarget
+        ;debris
+        jsr gameBombDeactivate
         jmp @leftImpact
 
 @centerImpactTarget
         GAMEMAP_SETCHAR_V #12
-        inc bombYChar
-        jsr gameBombDestroyBackground
-        dec bombYChar
+        dey
+        GAMEMAP_SETCHAR_V #12
+        dey
+        GAMEMAP_SETCHAR_V #12
+        iny
+        iny
+        iny
+        GAMEMAP_SETCHAR_V #12
+        iny
+        GAMEMAP_SETCHAR_V #12
+        dey
+        dey
         jmp @leftImpact
 
 @centerImpactLandscape
         GAMEMAP_SETCHAR_V #99
+        jsr gameBombDeactivate
 
 @leftImpact
         dey
@@ -218,11 +228,6 @@ gameBombDestroyBackground
 
 @leftImpactTarget
         GAMEMAP_SETCHAR_V #12
-        inc bombYChar
-        dec bombXChar
-        jsr gameBombDestroyBackground
-        dec bombYChar
-        inc bombXChar
         jmp @rightImpact
 
 @leftImpactLandscape
@@ -234,7 +239,7 @@ gameBombDestroyBackground
         GAMEMAP_GETCHAR bombImpactChar
         cmp #12
         beq @doneImpact
-        cmp #98
+        cmp #97
         bcc @rightImpactLandscape
         cmp #101
         bcs @rightImpactTarget
@@ -242,11 +247,6 @@ gameBombDestroyBackground
 
 @rightImpactTarget
         GAMEMAP_SETCHAR_V #12
-        inc bombYChar
-        inc bombXChar
-        jsr gameBombDestroyBackground
-        dec bombYChar
-        dec bombXChar
         jmp @doneImpact
 
 @rightImpactLandscape
@@ -254,15 +254,15 @@ gameBombDestroyBackground
 
 @doneImpact
 
-        dec bombYChar
-        GAMEMAP_SETCHARPOSITION_AAA screenColumn, bombYChar, bombXChar
-        GAMEMAP_GETCHAR bombImpactChar
-        GAMEMAP_SETCHAR_V #12
-        dey
-        GAMEMAP_SETCHAR_V #12
-        iny
-        iny
-        GAMEMAP_SETCHAR_V #12
+        ;dec bombYChar
+        ;GAMEMAP_SETCHARPOSITION_AAA screenColumn, bombYChar, bombXChar
+        ;;GAMEMAP_GETCHAR bombImpactChar
+        ;GAMEMAP_SETCHAR_V #12
+        ;dey
+        ;GAMEMAP_SETCHAR_V #12
+        ;iny
+        ;iny
+        ;GAMEMAP_SETCHAR_V #12
 
         rts
 
@@ -272,9 +272,9 @@ gameBombDestroyBackground
 gameBombUpdateCollisions
 
         ; if we have collided with someone else's bullet, always collision
-        GAMEBULLETS_COLLIDED_AAAV bombXChar, bombYChar, bombSprite
-        cmp #1
-        beq @gBUCCollision
+        ;GAMEBULLETS_COLLIDED_AAAV bombXChar, bombYChar, bombSprite
+        ;cmp #1
+        ;beq @gBUCCollision
 
         ; if we haven't hit someone else's bullet and we're in the background layer, no collision
         lda bombYChar
@@ -282,9 +282,9 @@ gameBombUpdateCollisions
         bcc @gBUCNoCollision
 
         ; if we're above the vertical display area, no collision
-        lda bombY
-        cmp #40
-        bcc @gBUCNoCollision
+        ;lda bombY
+        ;cmp #40
+        ;bcc @gBUCNoCollision
 
         ; if we have hit a non-terrain background character, no collision
         LIBSCREEN_BACKGROUND_CHECK bombXChar, bombYChar
@@ -292,6 +292,20 @@ gameBombUpdateCollisions
         beq @gBUCNoCollision
 
 @gBUCCollision
+
+        ; run explosion animation
+        LIBSPRITE_SETFRAME_AVV          bombSprite, #0, EXPLOSION1RAM
+        LIBSPRITE_SETCOLOR_AV           bombSprite, Yellow
+        LIBSPRITE_PLAYANIM_AVVVV        bombSprite, 0, 11, 3, False
+
+        jsr gameBombDestroyBackground
+                                
+@gBUCNoCollision
+
+        rts
+
+gameBombDeactivate
+
         lda #False
         sta bombActive
 
@@ -301,18 +315,9 @@ gameBombUpdateCollisions
         lda #0
         sta bombHorizontalSpeed
 
-        ; run explosion animation
-        LIBSPRITE_SETFRAME_AVV          bombSprite, #0, EXPLOSION1RAM
-        LIBSPRITE_SETCOLOR_AV           bombSprite, Yellow
-        LIBSPRITE_PLAYANIM_AVVVV        bombSprite, 0, 11, 3, False
-
         ; play explosion sound
         LIBSOUND_BOMB_STOP
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
-
-        jsr gameBombDestroyBackground
-                                
-@gBUCNoCollision
 
         rts
 
@@ -410,8 +415,8 @@ gameBombSetSpritePosition
         sta bombXLow
 @resetDone
         ; clamp bomb's x position
-        ;LIBMATH_MAX16BIT_AAVV bombXHigh, bombXLow, BombXMinHigh, BombXMinLow
-        ;LIBMATH_MIN16BIT_AAVV bombXHigh, bombXLow, BombXMaxHigh, BombXMaxLow
+        LIBMATH_MAX16BIT_AAVV bombXHigh, bombXLow, BombXMinHigh, BombXMinLow
+        LIBMATH_MIN16BIT_AAVV bombXHigh, bombXLow, BombXMaxHigh, BombXMaxLow
 
         ; clamp bomb's y position
         LIBMATH_MIN8BIT_AV bombY, BombYMax

@@ -263,14 +263,14 @@ defm LIBSOUND_PLAY_VAA  ; /1 = Voice                   (Value)
 
 ;===============================================================================
 
-defm LIBSOUND_BOMB_START_VV  ; /1 = Frequency High (Value)
-                             ; /2 = Frequency Low  (Value)
+defm LIBSOUND_BOMB_START_AA  ; /1 = Frequency High (Address)
+                             ; /2 = Frequency Low  (Address)
 
-        lda #175
-        sbc #/1
+        lda #255
+        sbc /1
         tax
-        lda #150
-        sbc #/2
+        lda #230
+        sbc /2
         tay
 
         jsr libSoundBombStart
@@ -285,7 +285,7 @@ libSoundBombStart
         lda #Attack_2ms+Decay_6ms
         sta ATDCY1
 
-        lda #Sustain_Vol10+Release_300ms
+        lda #Sustain_Vol7+Release_300ms
         sta SUREL1
 
         lda #SawtoothStart
@@ -296,13 +296,12 @@ libSoundBombStart
 defm LIBSOUND_BOMB_UPDATE_AA  ; /1 = Frequency High (Address)
                               ; /2 = Frequency Low  (Address)
 
-        lda #175
+        lda #255
         sbc /1
-        ora #128
         sta FREHI1
-        lda #150
+        
+        lda #230
         sbc /2
-        ora #128
         sta FRELO1
 
         endm
