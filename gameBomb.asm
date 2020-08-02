@@ -22,15 +22,19 @@ debrisSpriteFrame    byte 0
 bombSpriteFrame      byte 0
 bombXHigh            byte 0
 bombXLow             byte 0
+debrisXHigh          byte 0
+debrisXLow           byte 0
 bombY                byte 0
+debrisY              byte 0
 bombXChar            byte 0
 bombXOffset          byte 0
 bombYChar            byte 0
 bombYOffset          byte 0
 bombHorizontalSpeed  byte 0
 bombVerticalSpeed    byte 0
-
+bombExploding        byte 0
 bombImpactChar       byte 0
+bombTerrainImpact    byte 0
 
                         ; down-sampled animation frames to reduce sprite size
 bombSpriteFrameConv   byte    0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  4
@@ -49,6 +53,9 @@ defm    GAMEBOMB_DROPBOMB_AAAAVV
 
         lda bombActive ; only one bomb at a time
         bne @noDrop
+
+        lda #0
+        sta bombExploding
 
         lda /1
         sta bombFrame
@@ -84,6 +91,9 @@ defm    GAMEBOMB_DROPBOMB_AAAAAA
 
         lda bombActive ; only one bomb at a time
         bne @noDrop
+
+        lda #0
+        sta bombExploding
 
         lda /1
         sta bombFrame
@@ -122,6 +132,24 @@ gameBombDebris
         LIBSPRITE_MULTICOLORENABLE_AV   debrisSprite, False
         LIBSPRITE_SETCOLOR_AV           debrisSprite, White
         LIBSPRITE_PLAYANIM_AVVVV        debrisSprite, 0, 11, 3, False
+
+        rts
+
+gameBombPositionDebris
+
+        lda bombExploding
+        cmp #0
+        beq debrisNoMove
+
+        LIBMATH_SUB8BIT_AVA bombY, #10, debrisY
+
+        LIBMATH_SUB16BIT_AAVAAA bombXHigh, bombXLow, 0, #12, debrisXHigh, debrisXLow
+
+debrisNoMove
+        jsr gameDebrisScrollAdjust
+
+        ; center the debris animation on the collision point
+        LIBSPRITE_SETPOSITION_AAAA debrisSprite, debrisXHigh, debrisXLow, debrisY
 
         rts
 
@@ -184,6 +212,10 @@ gameBombUpdate
         ; set the sprite position
         jsr gameBombSetSpritePosition
 
+        ;
+        inc debrisColor
+        LIBSPRITE_SETCOLOR_AA debrisSprite, debrisColor
+
 @updateDone
 
         rts
@@ -191,6 +223,9 @@ gameBombUpdate
 ;==============================================================================
 
 gameBombDestroyBackground
+
+        lda #0
+        sta bombTerrainImpact
 
         LIBSCREEN_SETCHARPOSITION_AA bombXChar, bombYChar
         LIBSCREEN_SETCHAR_V #12
@@ -233,13 +268,12 @@ gameBombDestroyBackground
         jsr gameBombDestroyBackground
         inc bombYChar
 
-        jsr gameBombDebris
-
         jmp @leftImpact
 
 @centerImpactLandscape
         GAMEMAP_SETCHAR_V #99
-        jsr gameBombDeactivate
+        lda #1
+        sta bombTerrainImpact
 
 @leftImpact
         dey
@@ -258,6 +292,8 @@ gameBombDestroyBackground
 
 @leftImpactLandscape
         GAMEMAP_SETCHAR_V #98
+        lda #1
+        sta bombTerrainImpact
       
 @rightImpact
         iny
@@ -277,18 +313,28 @@ gameBombDestroyBackground
 
 @rightImpactLandscape
         GAMEMAP_SETCHAR_V #100
+        lda #1
+        sta bombTerrainImpact
 
 @doneImpact
 
-        ;dec bombYChar
-        ;GAMEMAP_SETCHARPOSITION_AAA screenColumn, bombYChar, bombXChar
-        ;;GAMEMAP_GETCHAR bombImpactChar
-        ;GAMEMAP_SETCHAR_V #12
-        ;dey
-        ;GAMEMAP_SETCHAR_V #12
-        ;iny
-        ;iny
-        ;GAMEMAP_SETCHAR_V #12
+        lda bombTerrainImpact
+        cmp #0
+        beq @doneTerrainImpact
+
+        jsr gameBombDebris
+        jsr gameBombDeactivate
+
+        dec bombYChar
+        GAMEMAP_SETCHARPOSITION_AAA screenColumn, bombYChar, bombXChar
+        GAMEMAP_SETCHAR_V #12
+        dey
+        GAMEMAP_SETCHAR_V #12
+        iny
+        iny
+        GAMEMAP_SETCHAR_V #12
+
+@doneTerrainImpact
 
         rts
 
@@ -318,6 +364,9 @@ gameBombUpdateCollisions
         beq @gBUCNoCollision
 
 @gBUCCollision
+
+        lda #1
+        sta bombExploding
 
         ; run explosion animation
         LIBSPRITE_SETFRAME_AVV          bombSprite, #0, EXPLOSION1RAM
@@ -431,6 +480,24 @@ gameBombScrollAdjust
 
 ;===============================================================================
 
+gameDebrisScrollAdjust
+
+        lda ScreenScrollingLeft
+        beq @doneScrollingLeft
+        LIBMATH_SUB16BIT_AAVAAA debrisXHigh, debrisXLow, 0, #2, debrisXHigh, debrisXLow
+        jmp @doneScrollingRight
+
+@doneScrollingLeft
+        lda ScreenScrollingRight
+        beq @doneScrollingRight
+        LIBMATH_ADD16BIT_AAVAAA debrisXHigh, debrisXLow, 0, #2, debrisXHigh, debrisXLow
+
+@doneScrollingRight
+
+        rts
+
+;===============================================================================
+
 gameBombSetSpritePosition
 
         lda #BombXMaxHigh
@@ -450,7 +517,8 @@ gameBombSetSpritePosition
 
         ; set the sprite position
         LIBSPRITE_SETPOSITION_AAAA bombSprite, bombXHigh, bombXLow, bombY
-        LIBSPRITE_SETPOSITION_AAAA debrisSprite, bombXHigh, bombXLow, bombY
+
+        jsr gameBombPositionDebris
 
         rts
 
