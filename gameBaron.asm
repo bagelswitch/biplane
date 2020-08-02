@@ -64,7 +64,7 @@ baronYbulletArray      byte   -6, -5, -4, -3, -2,  0,  0,  0,  2,  3,  4,  5
 
 gameBaronInit
         
-        lda #True
+        lda #False
         sta baronActive
 
         LIBSPRITE_STOPANIM_A baronSprite
@@ -80,21 +80,18 @@ gameBaronInit
 
         lda #1
         sta baronXHigh
-        lda #200
+        lda #72
         sta baronXLow
-        lda #55
+        lda #40
         sta baronY
 
-        LIBSPRITE_ENABLE_AV             baronSprite, True
+        LIBSPRITE_ENABLE_AV             baronSprite, False
         ldx baronFrame
         lda baronSpriteFrameConv,x
         sta baronSpriteFrame
         LIBSPRITE_SETFRAME_AAV          baronSprite, baronSpriteFrame, BARONRAM
         LIBSPRITE_SETCOLOR_AV           baronSprite, Red
         LIBSPRITE_MULTICOLORENABLE_AV   baronSprite, True
-
-        lda #0
-        sta baronDelayCounter
 
         rts
 
@@ -106,9 +103,14 @@ gameBaronReset
 
         jsr gameBaronInit
 
-        inc EXTCOL
+        lda #True
+        sta baronActive
+        LIBSPRITE_ENABLE_AV             baronSprite, True
+
+        lda #255
+        sta baronDelayCounter
+
         jsr gameBaronUpdatePosition
-        dec EXTCOL
         
         rts
 

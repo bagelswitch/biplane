@@ -173,13 +173,6 @@ gamePlayerUpdateFiring
         jmp gPUFNofire
 
 playerCharActive
-        lda baronActive
-        bne baronCharActive
-        ; summon the baron
-        INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
-        jsr gameBaronReset
-
-baronCharActive
         ; play firing sound and fire a bullet
         INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow

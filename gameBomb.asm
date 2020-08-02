@@ -252,21 +252,17 @@ gameBombDestroyBackground
 
 @centerImpactTarget
         GAMEMAP_SETCHAR_V #12
-        dey
-        GAMEMAP_SETCHAR_V #12
-        dey
-        GAMEMAP_SETCHAR_V #12
-        iny
-        iny
-        iny
-        GAMEMAP_SETCHAR_V #12
-        iny
-        GAMEMAP_SETCHAR_V #12
-        dey
-        dey
+
+        ; raise impact point to top of building
         dec bombYChar
         jsr gameBombDestroyBackground
         inc bombYChar
+        GAMEMAP_SETCHARPOSITION_AAA screenColumn, bombYChar, bombXChar
+
+        ; factory destroyed, summon the baron
+        lda baronActive
+        bne @leftImpact
+        jsr gameBaronReset
 
         jmp @leftImpact
 
