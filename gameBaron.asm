@@ -3,11 +3,11 @@
 
 BaronMaxFrame           = 24
 BaronXMinHigh           = 0     ; 0*256 + 0 = 0  minX
-BaronXMinLow            = 0
+BaronXMinLow            = 16
 BaronXMaxHigh           = 1     ; 1*256 + 255 = 511 maxX
-BaronXMaxLow            = 255
+BaronXMaxLow            = 72
 BaronYMin               = 40
-BaronYMax               = 209
+BaronYMax               = 216
 BaronInputDelay         = 5
 
 ;===============================================================================
@@ -56,8 +56,8 @@ baronXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
                        byte    0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1
 
                         ; bullet directions by sprite frame
-baronYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
-                       byte    6,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5
+baronYbulletArray      byte   -6, -5, -4, -3, -2,  0,  0,  0,  2,  3,  4,  5
+                       byte    6,  5,  4,  3,  2,  0,  0,  0, -2, -3, -4, -5
 
 ;===============================================================================
 ; Macros/Subroutines

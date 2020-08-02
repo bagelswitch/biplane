@@ -49,12 +49,12 @@ playerYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
                         byte    3,  2,  2,  2,  1,   1,  0, -1, -1, -2, -2, -2
 
                         ; bullet directions by sprite frame
-playerXbulletArray      byte    0,  1,  2,  3,  4,  5,  6,  5,  4,  3,  2,  1
-                        byte    0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1
+playerXbulletArray      byte    0,  0,  3,  3,  3,  6,  6,  6,  3,  3,  3,  0
+                        byte    0,  0,  3,  3,  3,  6,  6,  6,  3,  3,  3,  0
 
                         ; bullet directions by sprite frame
-playerYbulletArray      byte   -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5
-                        byte    6,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5
+playerYbulletArray      byte   -6, -6, -3, -3, -3,  0,  0,  0,  3,  3,  3,  6
+                        byte    6,  6,  3,  3,  3,  0,  0,  0, -3, -3, -3, -6
 
                         ; horizontal velocities by sprite frame
 playerXbombArray        byte    0,  1,  1,  2,  2,  2,  2,  2,  2,  2,  1,  1
