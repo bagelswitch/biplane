@@ -162,6 +162,19 @@ defm    LIBSPRITE_SETFRAME_AAV           ; /1 = Sprite Number    (Address)
 
         endm
 
+;==============================================================================
+
+defm    LIBSPRITE_INCFRAME_A           ; /1 = Sprite Number    (Address)
+
+        ldy /1
+        clc
+        lda SPRITEONE0,y
+        adc #1
+        sta SPRITEONE0,y
+        sta SPRITETWO0,y
+
+        endm
+
 ;===============================================================================
 
 defm    LIBSPRITE_SETFRAME_AVV           ; /1 = Sprite Number    (Address)
@@ -291,6 +304,44 @@ defm    LIBSPRITE_SETPRIORITY_AV ; /1 = Sprite Number           (Address)
 @done
         endm
 
+;===============================================================================
+
+defm    LIBSPRITE_SETSIZEX_AV ; /1 = Sprite Number           (Address)
+                              ; /2 = True = Double, False = Normal (Value)
+        ldy /1
+        lda spriteNumberMask,y
+        
+        ldy #/2
+        beq @normal
+@double
+        ora SPSZX
+        sta SPSZX
+        jmp @done 
+@normal
+        eor #$FF
+        and SPSZX
+        sta SPSZX
+@done
+        endm
+
+defm    LIBSPRITE_SETSIZEY_AV ; /1 = Sprite Number           (Address)
+                              ; /2 = True = Double, False = Normal (Value)
+        ldy /1
+        lda spriteNumberMask,y
+        
+        ldy #/2
+        beq @normal
+@double
+        ora SPSZY
+        sta SPSZY
+        jmp @done 
+@normal
+        eor #$FF
+        and SPSZY
+        sta SPSZY
+@done
+        endm
+
 ;==============================================================================
 
 defm    LIBSPRITE_STOPANIM_A            ; /1 = Sprite Number    (Address)
@@ -319,8 +370,6 @@ lSoUActive
 
         lda spriteAnimsEndFrame,X
         sta spriteAnimsEndFrameCurrent
-        
-        LIBSPRITE_SETFRAME_AAV spriteAnimsCurrent, spriteAnimsFrameCurrent, EXPLOSION1RAM
 
         dec spriteAnimsDelay,X
         bne lSoUSkip
@@ -330,6 +379,7 @@ lSoUActive
         sta spriteAnimsDelay,X
 
         ; change the frame
+        LIBSPRITE_INCFRAME_A spriteAnimsCurrent
         inc spriteAnimsFrame,X
         
         ; check if reached the end frame

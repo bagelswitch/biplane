@@ -16,6 +16,9 @@ BombInputDelay         = 10
 bombActive           byte 0
 bombFrame            byte 1
 bombSprite           byte 2
+debrisSprite         byte 3
+debrisColor          byte 1
+debrisSpriteFrame    byte 0
 bombSpriteFrame      byte 0
 bombXHigh            byte 0
 bombXLow             byte 0
@@ -108,6 +111,22 @@ defm    GAMEBOMB_DROPBOMB_AAAAAA
 
 ;==============================================================================
 
+gameBombDebris
+        
+        LIBSPRITE_ENABLE_AV             debrisSprite, True
+        LIBSPRITE_SETFRAME_AAV          debrisSprite, debrisSpriteFrame, DEBRISRAM
+        LIBSPRITE_SETPRIORITY_AV        debrisSprite, False
+        LIBSPRITE_SETSIZEX_AV           debrisSprite, True
+        LIBSPRITE_SETSIZEY_AV           debrisSprite, True
+        LIBSPRITE_SETPOSITION_AAAA      debrisSprite, bombXHigh, bombXLow, bombY
+        LIBSPRITE_MULTICOLORENABLE_AV   debrisSprite, False
+        LIBSPRITE_SETCOLOR_AV           debrisSprite, White
+        LIBSPRITE_PLAYANIM_AVVVV        debrisSprite, 0, 11, 3, False
+
+        rts
+
+;==============================================================================
+
 gameBombInit
         
         lda #True
@@ -127,6 +146,7 @@ gameBombInit
 
         lda #0
         sta bombDelayCounter
+        sta debrisColor
 
         rts
 
@@ -212,6 +232,9 @@ gameBombDestroyBackground
         dec bombYChar
         jsr gameBombDestroyBackground
         inc bombYChar
+
+        jsr gameBombDebris
+
         jmp @leftImpact
 
 @centerImpactLandscape
@@ -427,6 +450,7 @@ gameBombSetSpritePosition
 
         ; set the sprite position
         LIBSPRITE_SETPOSITION_AAAA bombSprite, bombXHigh, bombXLow, bombY
+        LIBSPRITE_SETPOSITION_AAAA debrisSprite, bombXHigh, bombXLow, bombY
 
         rts
 

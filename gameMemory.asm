@@ -109,6 +109,12 @@ EXPLOSION1RAM   = 176
 * = $2C00
         incbin explosion1.bin
 
+; 188 decimal * 64(sprite size) = 12032(hex $2F00)
+DEBRISRAM   = 188
+
+* = $2F00
+        incbin debris.bin
+
 * = $3800
 CHARRAM
 incbin background.bin
@@ -153,9 +159,11 @@ SCROLY          = $D011
 RASTER          = $D012
 SPENA           = $D015
 SCROLX          = $D016
+SPSZY           = $D017
 VMCSB           = $D018
 SPBGPR          = $D01B
 SPMC            = $D01C
+SPSZX           = $D01D
 SPSPCL          = $D01E
 SPBPCL          = $D01F
 EXTCOL          = $D020
