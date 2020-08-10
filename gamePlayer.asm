@@ -106,8 +106,8 @@ gamePlayerInit
         lda playerSpriteFrameConv,x
         sta playerSpriteFrame
         LIBSPRITE_SETFRAME_AAV          playerSprite, playerSpriteFrame, PLAYERRAM
-        LIBSPRITE_SETCOLOR_AV           playerSprite, Green
-        LIBSPRITE_MULTICOLORENABLE_AV   playerSprite, True
+        LIBSPRITE_SETCOLOR_AV           playerSprite, Black
+        LIBSPRITE_MULTICOLORENABLE_AV   playerSprite, False
 
         lda #0
         sta playerDelayCounter
