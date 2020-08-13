@@ -16,7 +16,7 @@ BaronInputDelay         = 5
 baronActive           byte 1
 baronFrame            byte 6
 BaronSpriteFrame      byte 0
-baronSprite           byte 1
+baronSprite           byte 2
 baronXHigh            byte 0
 baronXLow             byte 75
 baronY                byte 55

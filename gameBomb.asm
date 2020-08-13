@@ -15,8 +15,8 @@ BombInputDelay         = 10
 
 bombActive           byte 0
 bombFrame            byte 1
-bombSprite           byte 2
-debrisSprite         byte 3
+bombSprite           byte 3
+debrisSprite         byte 4
 debrisColor          byte 1
 debrisSpriteFrame    byte 0
 bombSpriteFrame      byte 0

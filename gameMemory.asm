@@ -26,20 +26,22 @@ backgroundWriteColumn = $0C
 playerActive = $5D
 playerFrame = $5E
 playerSpriteFrame = $5F
-playerSprite = $60
-playerXHigh = $61
-playerXLow = $62
-playerY = $63
-playerXChar = $64
-playerXOffset = $65
-playerYChar = $66
-playerYOffset = $67
-playerHorizontalSpeed = $68
-playerVerticalSpeed = $69
-playerHorizontalBombSpeed = $6A
-playerVerticalBombSpeed = $6B
-playerHorizontalBulletSpeed = $6C
-playerVerticalBulletSpeed = $6D
+playerOutlineSprite = $60
+; for some reason, using $61 to store a sprite # blows up character RAM !?
+playerXHigh = $62
+playerXLow = $63
+playerY = $64
+playerXChar = $65
+playerXOffset = $66
+playerYChar = $67
+playerYOffset = $68
+playerHorizontalSpeed = $69
+playerVerticalSpeed = $6A
+playerHorizontalBombSpeed = $6B
+playerVerticalBombSpeed = $6C
+playerHorizontalBulletSpeed = $6D
+playerVerticalBulletSpeed = $6E
+playerColorSprite = $6F
 
 
 ; using $73-$8A CHRGET as BASIC not used for our game
@@ -85,17 +87,17 @@ SPRITEONE0      = $07F8
 SCREENRAMTWO    = $2000
 SPRITETWO0      = $23F8
 
-; 152 decimal * 64(sprite size) = 9728(hex $2600)
-PLAYERRAM       = 152
+; 148 decimal * 64(sprite size) = 9472(hex $2500)
+PLAYEROUTLINERAM       = 148
 
-* = $2600
-        incbin sopwith.bin
+* = $2500
+        incbin sopwithoutline.bin
 
 ; 160 decimal * 64(sprite size) = 10240(hex $2800)
-BARONRAM        = 160
+PLAYERCOLORRAM       = 160
 
 * = $2800
-        incbin baron.bin
+        incbin sopwithcolor.bin
 
 ; 168 decimal * 64(sprite size) = 10752(hex $2A00)
 BOMBRAM        = 168
@@ -114,6 +116,12 @@ DEBRISRAM   = 188
 
 * = $2F00
         incbin debris.bin
+
+; 200 decimal * 64(sprite size) = 12800(hex $3200)
+BARONRAM        = 200
+
+* = $3200
+        incbin baron.bin
 
 * = $3800
 CHARRAM

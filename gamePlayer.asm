@@ -77,7 +77,8 @@ gamePlayerInit
         lda #True
         sta playerActive
 
-        LIBSPRITE_STOPANIM_A playerSprite
+        LIBSPRITE_STOPANIM_A playerOutlineSprite
+        LIBSPRITE_STOPANIM_A playerColorSprite
 
         lda #6
         sta playerFrame
@@ -99,15 +100,22 @@ gamePlayerInit
         sta playerXChar
         
         lda #0
-        sta playerSprite
+        sta playerOutlineSprite
 
-        LIBSPRITE_ENABLE_AV             playerSprite, True
+        lda #1
+        sta playerColorSprite
+
+        LIBSPRITE_ENABLE_AV             playerOutlineSprite, True
+        LIBSPRITE_ENABLE_AV             playerColorSprite, True
         ldx playerFrame
         lda playerSpriteFrameConv,x
         sta playerSpriteFrame
-        LIBSPRITE_SETFRAME_AAV          playerSprite, playerSpriteFrame, PLAYERRAM
-        LIBSPRITE_SETCOLOR_AV           playerSprite, Black
-        LIBSPRITE_MULTICOLORENABLE_AV   playerSprite, False
+        LIBSPRITE_SETFRAME_AAV          playerOutlineSprite, playerSpriteFrame, PLAYEROUTLINERAM
+        LIBSPRITE_SETCOLOR_AV           playerOutlineSprite, Black
+        LIBSPRITE_MULTICOLORENABLE_AV   playerOutlineSprite, False
+        LIBSPRITE_SETFRAME_AAV          playerColorSprite, playerSpriteFrame, PLAYERCOLORRAM
+        LIBSPRITE_SETCOLOR_AV           playerColorSprite, Green
+        LIBSPRITE_MULTICOLORENABLE_AV   playerColorSprite, True
 
         lda #0
         sta playerDelayCounter
@@ -176,7 +184,7 @@ playerCharActive
         ; play firing sound and fire a bullet
         INCREMENT_FIRE_DELAY_AA playerFireCounter, gPUFNofire
         LIBSOUND_PLAY_VAA 1, soundExplosionHigh, soundExplosionLow
-        GAMEBULLETS_FIRE_AAAVAAAA playerXHigh, playerXLow, playerY, Black, playerHorizontalBulletSpeed, playerVerticalBulletSpeed, playerSprite, playerFrame
+        GAMEBULLETS_FIRE_AAAVAAAA playerXHigh, playerXLow, playerY, Black, playerHorizontalBulletSpeed, playerVerticalBulletSpeed, playerOutlineSprite, playerFrame
 
 gPUFNofire
 
@@ -197,7 +205,7 @@ gamePlayerUpdateCollisions
 @continue
 
         ; if we have collided with someone else's bullet, always collision
-        GAMEBULLETS_COLLIDED_AAAV playerXChar, playerYChar, playerSprite
+        GAMEBULLETS_COLLIDED_AAAV playerXChar, playerYChar, playerOutlineSprite
         cmp #1
         beq @gPUCCollision
 
@@ -217,18 +225,28 @@ gamePlayerUpdateCollisions
         beq @gPUCNoCollision
 
 @gPUCcollision
+        jsr gamePlayerDestroyPlayer
+                                
+@gPUCNoCollision
+
+        rts
+
+gamePlayerDestroyPlayer
+
         lda #False
         sta playerActive
 
         ; run explosion animation
-        LIBSPRITE_SETFRAME_AVV          playerSprite, #0, EXPLOSION1RAM
-        LIBSPRITE_SETCOLOR_AV           playerSprite, Yellow
-        LIBSPRITE_PLAYANIM_AVVVV        playerSprite, 0, 11, 3, False
+        LIBSPRITE_SETFRAME_AVV          playerOutlineSprite, #0, EXPLOSION1RAM
+        LIBSPRITE_SETCOLOR_AV           playerOutlineSprite, Yellow
+        LIBSPRITE_PLAYANIM_AVVVV        playerOutlineSprite, 0, 11, 3, False
+
+        LIBSPRITE_SETFRAME_AVV          playerColorSprite, #0, DEBRISRAM
+        LIBSPRITE_SETCOLOR_AV           playerColorSprite, Black
+        LIBSPRITE_PLAYANIM_AVVVV        playerColorSprite, 0, 11, 3, False
 
         ; play explosion sound
         LIBSOUND_PLAY_VAA 2, soundFiringHigh, soundFiringLow
-                                
-@gPUCNoCollision
 
         rts
 
@@ -293,7 +311,8 @@ leftRotate
 
         lda playerSpriteFrameConv,x
         sta playerSpriteFrame
-        LIBSPRITE_SETFRAME_AAV           playerSprite, playerSpriteFrame, PLAYERRAM
+        LIBSPRITE_SETFRAME_AAV           playerOutlineSprite, playerSpriteFrame, PLAYEROUTLINERAM
+        LIBSPRITE_SETFRAME_AAV           playerColorSprite, playerSpriteFrame, PLAYERCOLORRAM
 
 gPUPRight
         LIBINPUT_GETKEYPRESSED DKeyRow, DKeyBit
@@ -316,7 +335,8 @@ rightRotate
 
         lda playerSpriteFrameConv,x
         sta playerSpriteFrame
-        LIBSPRITE_SETFRAME_AAV           playerSprite, playerSpriteFrame, PLAYERRAM
+        LIBSPRITE_SETFRAME_AAV           playerOutlineSprite, playerSpriteFrame, PLAYEROUTLINERAM
+        LIBSPRITE_SETFRAME_AAV           playerColorSprite, playerSpriteFrame, PLAYERCOLORRAM
 
 gPUPUp
 ;        LIBINPUT_GETHELD GameportUpMask
@@ -368,7 +388,8 @@ gPUPEndmove
 
         ; set the sprite position
         ; can get away with 8 bits b/c the clamp area has <255 max X
-        LIBSPRITE_SETPOSITION_AAA playerSprite, PlayerXLow, PlayerY
+        LIBSPRITE_SETPOSITION_AAA playerOutlineSprite, PlayerXLow, PlayerY
+        LIBSPRITE_SETPOSITION_AAA playerColorSprite, PlayerXLow, PlayerY
 
         ; update the player char positions
         LIBSCREEN_PIXELTOCHAR_AAVAVAAAA playerXHigh, playerXLow, 16, playerY, 40, playerXChar, playerXOffset, playerYChar, playerYOffset
