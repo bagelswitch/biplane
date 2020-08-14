@@ -48,6 +48,7 @@ playerXmoveArray        byte    0,  1,  1,  2,  2,  2,  3,  2,  2,  2,  1,  1
 playerYmoveArray        byte   -3, -2, -2, -2, -1,  -1,  0,  1,  1,  2,  2,  2
                         byte    3,  2,  2,  2,  1,   1,  0, -1, -1, -2, -2, -2
 
+
                         ; bullet directions by sprite frame
 playerXbulletArray      byte    0,  0,  3,  3,  3,  6,  6,  6,  3,  3,  3,  0
                         byte    0,  0,  3,  3,  3,  6,  6,  6,  3,  3,  3,  0
