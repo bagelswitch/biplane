@@ -77,6 +77,17 @@
             <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
+            <Name>baroncolor.spt</Name>
+            <PrgName />
+            <FileType>7</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
+        </SourceFile>
+        <SourceFile>
             <Name>bomb.spt</Name>
             <PrgName />
             <FileType>7</FileType>
@@ -127,8 +138,8 @@
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />
-            <Bookmarks>284,</Bookmarks>
-            <Topmost>False</Topmost>
+            <Bookmarks>302,</Bookmarks>
+            <Topmost>True</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
         <SourceFile>

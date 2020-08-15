@@ -238,13 +238,13 @@ gamePlayerDestroyPlayer
         sta playerActive
 
         ; run explosion animation
-        LIBSPRITE_SETFRAME_AVV          playerOutlineSprite, #0, EXPLOSION1RAM
-        LIBSPRITE_SETCOLOR_AV           playerOutlineSprite, Yellow
-        LIBSPRITE_PLAYANIM_AVVVV        playerOutlineSprite, 0, 11, 3, False
-
-        LIBSPRITE_SETFRAME_AVV          playerColorSprite, #0, DEBRISRAM
-        LIBSPRITE_SETCOLOR_AV           playerColorSprite, Black
+        LIBSPRITE_SETFRAME_AVV          playerColorSprite, #0, EXPLOSION1RAM
+        LIBSPRITE_SETCOLOR_AV           playerColorSprite, Yellow
         LIBSPRITE_PLAYANIM_AVVVV        playerColorSprite, 0, 11, 3, False
+
+        LIBSPRITE_SETFRAME_AVV          playerOutlineSprite, #0, DEBRISRAM
+        LIBSPRITE_SETCOLOR_AV           playerOutlineSprite, Black
+        LIBSPRITE_PLAYANIM_AVVVV        playerOutlineSprite, 0, 11, 3, False
 
         ; play explosion sound
         LIBSOUND_PLAY_VAA 2, soundFiringHigh, soundFiringLow

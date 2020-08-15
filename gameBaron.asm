@@ -16,7 +16,8 @@ BaronInputDelay         = 5
 baronActive           byte 1
 baronFrame            byte 6
 BaronSpriteFrame      byte 0
-baronSprite           byte 2
+baronOutlineSprite    byte 2
+baronColorSprite      byte 3
 baronXHigh            byte 0
 baronXLow             byte 75
 baronY                byte 55
@@ -67,7 +68,8 @@ gameBaronInit
         lda #False
         sta baronActive
 
-        LIBSPRITE_STOPANIM_A baronSprite
+        LIBSPRITE_STOPANIM_A baronOutlineSprite
+        LIBSPRITE_STOPANIM_A baronColorSprite
 
         lda #18
         sta baronFrame
@@ -85,13 +87,17 @@ gameBaronInit
         lda #40
         sta baronY
 
-        LIBSPRITE_ENABLE_AV             baronSprite, False
+        LIBSPRITE_ENABLE_AV             baronOutlineSprite, False
+        LIBSPRITE_ENABLE_AV             baronColorSprite, False
         ldx baronFrame
         lda baronSpriteFrameConv,x
         sta baronSpriteFrame
-        LIBSPRITE_SETFRAME_AAV          baronSprite, baronSpriteFrame, BARONRAM
-        LIBSPRITE_SETCOLOR_AV           baronSprite, Red
-        LIBSPRITE_MULTICOLORENABLE_AV   baronSprite, True
+        LIBSPRITE_SETFRAME_AAV          baronOutlineSprite, baronSpriteFrame, PLAYEROUTLINERAM
+        LIBSPRITE_SETCOLOR_AV           baronOutlineSprite, Black
+        LIBSPRITE_MULTICOLORENABLE_AV   baronOutlineSprite, False
+        LIBSPRITE_SETFRAME_AAV          baronColorSprite, baronSpriteFrame, BARONCOLORRAM
+        LIBSPRITE_SETCOLOR_AV           baronColorSprite, Red
+        LIBSPRITE_MULTICOLORENABLE_AV   baronColorSprite, True
 
         rts
 
@@ -105,7 +111,8 @@ gameBaronReset
 
         lda #True
         sta baronActive
-        LIBSPRITE_ENABLE_AV             baronSprite, True
+        LIBSPRITE_ENABLE_AV             baronOutlineSprite, True
+        LIBSPRITE_ENABLE_AV             baronColorSprite, True
 
         lda #255
         sta baronDelayCounter
@@ -140,7 +147,7 @@ gameBaronUpdateFiring
         lda baronIsFiring
         cmp #1
         bne gBNoFire
-        GAMEBULLETS_FIRE_AAAVAAAA baronXHigh, baronXLow, baronY, Black, baronHorizontalBulletSpeed, baronVerticalBulletSpeed, baronSprite, baronFrame
+        GAMEBULLETS_FIRE_AAAVAAAA baronXHigh, baronXLow, baronY, Black, baronHorizontalBulletSpeed, baronVerticalBulletSpeed, baronOutlineSprite, baronFrame
 gBNoFire
 
         rts
@@ -160,7 +167,7 @@ gameBaronUpdateCollisions
 @continue
 
         ; if we have collided with someone else's bullet, always collision
-        GAMEBULLETS_COLLIDED_AAAV baronXChar, baronYChar, baronSprite
+        GAMEBULLETS_COLLIDED_AAAV baronXChar, baronYChar, baronOutlineSprite
         cmp #1
         beq @gBUCCollision
 
@@ -180,18 +187,29 @@ gameBaronUpdateCollisions
         beq @gBUCNoCollision
 
 @gBUCCollision
+        
+        jsr gameBaronDestroyBaron
+                                
+@gBUCNoCollision
+
+        rts
+
+gameBaronDestroyBaron
+
         lda #False
         sta baronActive
 
         ; run explosion animation
-        LIBSPRITE_SETFRAME_AVV          baronSprite, #0, EXPLOSION1RAM
-        LIBSPRITE_SETCOLOR_AV           baronSprite, Yellow
-        LIBSPRITE_PLAYANIM_AVVVV        baronSprite, 0, 11, 3, False
+        LIBSPRITE_SETFRAME_AVV          baronColorSprite, #0, EXPLOSION1RAM
+        LIBSPRITE_SETCOLOR_AV           baronColorSprite, Yellow
+        LIBSPRITE_PLAYANIM_AVVVV        baronColorSprite, 0, 11, 3, False
+
+        LIBSPRITE_SETFRAME_AVV          baronOutlineSprite, #0, DEBRISRAM
+        LIBSPRITE_SETCOLOR_AV           baronOutlineSprite, Black
+        LIBSPRITE_PLAYANIM_AVVVV        baronOutlineSprite, 0, 11, 3, False
 
         ; play explosion sound
         LIBSOUND_PLAY_VAA 2, soundPickupHigh, soundPickupLow
-                                
-@gBUCNoCollision
 
         rts
 
@@ -335,7 +353,8 @@ gBEndmove
         ;LIBSPRITE_ENABLE_AV             baronSprite, True
         lda baronSpriteFrameConv,x
         sta baronSpriteFrame
-        LIBSPRITE_SETFRAME_AAV          baronSprite, baronSpriteFrame, BARONRAM
+        LIBSPRITE_SETFRAME_AAV          baronOutlineSprite, baronSpriteFrame, PLAYEROUTLINERAM
+        LIBSPRITE_SETFRAME_AAV          baronColorSprite, baronSpriteFrame, BARONCOLORRAM
 
         ; apply horizontal velocity
         cpx #13
@@ -366,7 +385,8 @@ gBEndmove
         LIBMATH_MAX8BIT_AV baronY, BaronYMin
 
         ; set the sprite position
-        LIBSPRITE_SETPOSITION_AAAA baronSprite, baronXHigh, baronXLow, baronY
+        LIBSPRITE_SETPOSITION_AAAA baronOutlineSprite, baronXHigh, baronXLow, baronY
+        LIBSPRITE_SETPOSITION_AAAA baronColorSprite, baronXHigh, baronXLow, baronY
 
         ; update the baron's char positions
         LIBSCREEN_PIXELTOCHAR_AAVAVAAAA baronXHigh, baronXLow, 16, baronY, 40, baronXChar, baronXOffset, baronYChar, baronYOffset

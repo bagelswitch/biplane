@@ -118,10 +118,10 @@ DEBRISRAM   = 188
         incbin debris.bin
 
 ; 200 decimal * 64(sprite size) = 12800(hex $3200)
-BARONRAM        = 200
+BARONCOLORRAM        = 200
 
 * = $3200
-        incbin baron.bin
+        incbin baroncolor.bin
 
 * = $3800
 CHARRAM
