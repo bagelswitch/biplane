@@ -96,6 +96,7 @@ gameMapInit
         lda #0
         sta screenColumn
         sta backgroundColumn
+        sta backgroundScrollingColumn
 
         jsr gameColorUpdateTopExtra
         jsr gameColorUpdateTop
@@ -213,23 +214,23 @@ gameMapUpdateTopPrimaryExtra
 
         ; map characters
         ;LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM,      SCREENRAMONE,     backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+240,  SCREENRAMONE+40,  backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+480,  SCREENRAMONE+80,  backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+720,  SCREENRAMONE+120, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+960,  SCREENRAMONE+160, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1200, SCREENRAMONE+200, backgroundColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+240,  SCREENRAMONE+40,  backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+480,  SCREENRAMONE+80,  backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+720,  SCREENRAMONE+120, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+960,  SCREENRAMONE+160, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1200, SCREENRAMONE+200, backgroundScrollingColumn
 
         rts
 
 gameMapUpdateTopPrimary
 
         ; map characters
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1440, SCREENRAMONE+240, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1680, SCREENRAMONE+280, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1920, SCREENRAMONE+320, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2160, SCREENRAMONE+360, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2400, SCREENRAMONE+400, backgroundColumn
-        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2640, SCREENRAMONE+440, backgroundColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1440, SCREENRAMONE+240, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1680, SCREENRAMONE+280, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+1920, SCREENRAMONE+320, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2160, SCREENRAMONE+360, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2400, SCREENRAMONE+400, backgroundScrollingColumn
+        LIBSCREEN_COPYMAPROW_NEW_VVA MAPRAM+2640, SCREENRAMONE+440, backgroundScrollingColumn
 
         rts
 

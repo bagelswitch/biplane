@@ -6,19 +6,17 @@ ZeroPageTemp    = $02
 ; $03-$8F   Reserved for BASIC
 ZeroPageTemp2   = $03
 
-baronDelayCounter  = $04
-playerDelayCounter = $05
-playerFireCounter  = $0D
-bombDelayCounter   = $09
-baronIsFiring      = $06
-
-screenColumn       = $07
-backgroundColumn   = $08
-
-screenOneActive    = $0A
-screenTwoActive    = $0B
-
-backgroundWriteColumn = $0C
+baronDelayCounter     = $04
+playerDelayCounter    = $05
+baronIsFiring         = $06
+screenColumn          = $07
+backgroundColumn      = $08
+bombDelayCounter      = $09
+screenOneActive       = $0A
+screenTwoActive       = $0B
+backgroundScrollingColumn = $0C
+playerFireCounter     = $0D
+flipScreenCounter     = $0E
 
 ;===============================================================================
 ; use zero page for player variables to improve speed

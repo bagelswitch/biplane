@@ -355,7 +355,7 @@ gameBombUpdateCollisions
         ;bcc @gBUCNoCollision
 
         ; if we have hit a non-terrain background character, no collision
-        LIBSCREEN_BACKGROUND_CHECK bombXChar, bombYChar
+        LIBSCREEN_BACKGROUND_CHECK_AA bombXChar, bombYChar
         cmp #0
         beq @gBUCNoCollision
 

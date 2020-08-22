@@ -167,7 +167,23 @@ backgroundCheckYChar byte 0
 
 ;===============================================================================
 
-defm LIBSCREEN_BACKGROUND_CHECK
+defm LIBSCREEN_SET_SECONDARY_SCREEN
+        lda $D018
+        and #%00001111
+        ora #%10000000      ; set active screen RAM to SCREENRAMTWO/$2000
+        sta $D018
+
+        endm
+
+defm LIBSCREEN_SET_PRIMARY_SCREEN
+        lda $D018
+        and #%00001111
+        ora #%00010000      ; set active screen RAM to SCREENRAMONE/$0400
+        sta $D018
+
+        endm
+
+defm LIBSCREEN_BACKGROUND_CHECK_AA
         lda /1
         sta backgroundCheckXChar
         lda /2

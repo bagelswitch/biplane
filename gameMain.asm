@@ -52,7 +52,7 @@
         LIBSCREEN_SETCHARMEMORY 14
 
         ; Set 38 column screen mode
-        LIBSCREEN_SET38COLUMNMODE
+        ;LIBSCREEN_SET38COLUMNMODE
         
         ; Set 24 row screen mode
         ;LIBSCREEN_SET24ROWMODE
@@ -61,6 +61,9 @@
         sta screenOneActive
         lda #0
         sta screenTwoActive
+
+        lda #1
+        sta flipScreenCounter
 
         ; set up raster interrupt
         lda #%01111111
@@ -146,22 +149,19 @@ Irq     ; fires at raster line 10
         LIBSCREEN_SETCOLORS Black, LightBlue, Brown, White, Black
         LIBSCREEN_SCROLLTOBACKGROUND
 
-        lda #5
+        lda #0
         sta EXTCOL
 
-        SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     6, 6, gameMapUpdateBottom, gameMapUpdateBottom
-        ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     0, 6, gameColorUpdateBottom, gameColorUpdateBottom
-        SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     0, 0, gameMapUpdateBottomExtra, gameMapUpdateBottomExtra
-
+        SCREEN_UPDATE_SCROLLING_AVA screenScrollXValue, 2, gameMapUpdateBottom
+        SCREEN_UPDATE_SCROLLING_AVA screenScrollXValue, 4, gameMapUpdateBottomExtra
 
         ;lda #9
         ;sta EXTCOL
 
-        SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     1, 1, gameMapUpdateTop, gameMapUpdateTop
-        SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     5, 5, gameMapUpdateTop, gameMapUpdateTop
-        ;SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     6, 0, gameColorUpdateTop, gameColorUpdateTop
-        SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     2, 2, gameMapUpdateTopExtra, gameMapUpdateTopExtra
-        SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue,     6, 6, gameMapUpdateTopExtra, gameMapUpdateTopExtra
+        SCREEN_UPDATE_SCROLLING_AVA backgroundScrollXValue, 0, gameMapUpdateTop
+        SCREEN_UPDATE_SCROLLING_AVA backgroundScrollXValue, 3, gameMapUpdateTopExtra
+        SCREEN_UPDATE_SCROLLING_AVA backgroundScrollXValue, 4, gameMapUpdateTop
+        SCREEN_UPDATE_SCROLLING_AVA backgroundScrollXValue, 7, gameMapUpdateTopExtra
         
         lda #15
         sta EXTCOL
@@ -195,10 +195,6 @@ Irq2    ; fires at raster line 146
         lda #5
         sta EXTCOL
         LIBSCREEN_SCROLLTOFOREGROUND
-        ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     2, 4, gameMapUpdateBottomExtra, gameMapUpdateBottomExtra
-        ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     0, 6, gameColorUpdateBottomExtra, gameColorUpdateBottomExtra
-        ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     4, 2, gameMapUpdateTopExtra, gameMapUpdateTopExtra
-        ;SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue,     6, 0, gameColorUpdateTopExtra, gameColorUpdateTopExtra
 
         jsr gMLoop2
 
@@ -217,8 +213,10 @@ Irq3    ; fires at raster line 234
         sta EXTCOL
         LIBSCREEN_SCROLLTOSCOREBOARD
 
-        SCREEN_UPDATE_SCROLLING_AVVAA screenScrollXValue, 6, 0, flipScreenLeft, flipScreenRight
-        SCREEN_UPDATE_SCROLLING_AVVAA backgroundScrollXValue, 4, 4, flipBackgroundLeft, flipBackgroundRight
+        SCREEN_UPDATE_SCROLLING_AVA screenScrollXValue, 0, flipScreen
+        SCREEN_UPDATE_SCROLLING_AVA backgroundScrollXValue, 4, flipBackground
+
+        jsr scrollScreen
 
         jsr gMLoop1
 
@@ -247,40 +245,87 @@ Irq3    ; fires at raster line 234
 
 ;===============================================================================
 
-defm SCREEN_UPDATE_SCROLLING_AVVAA
+defm SCREEN_UPDATE_SCROLLING_AVA
+
+        lda /1
+        cmp #/2
+        bne @updateFinished
+        jsr /3
+
+@updateFinished
+
+        endm
+
+;===============================================================================
+
+scrollScreen
+
+        lda ScreenScrollingRight
+        bne @scrollNegative
+        lda ScreenScrollingLeft
+        bne @scrollPositive
+        jmp @scrollFinished
+
+@scrollNegative
+        LIBSCREEN_FOREGROUNDSCROLLRIGHTTWO
+        LIBSCREEN_BACKGROUNDSCROLLRIGHTONE
+
+        lda screenScrollXValue
+        cmp #0
+        bne @scrollFinished
+        jsr flipScreenLeft
+
+        jmp @scrollFinished
+
+@scrollPositive
+        LIBSCREEN_FOREGROUNDSCROLLLEFTTWO
+        LIBSCREEN_BACKGROUNDSCROLLLEFTONE
+
+        lda screenScrollXValue
+        cmp #6
+        bne @scrollFinished
+        jsr flipScreenRight
+
+@scrollFinished
+        rts
+
+
+flipScreen
 
         lda ScreenScrollingRight
         bne @scrollNegative
         lda ScreenScrollingLeft
         bne @scrollPositive
         jmp @finished
+
 @scrollNegative
-        lda /1
-        cmp #/2
-        bne @finished
-        jsr /4
-        jmp @finished
+        dec flipScreenCounter
+        lda flipScreenCounter
+        cmp #1
+        bcs @finished
+        lda #1
+        sta flipScreenCounter
+
+        jmp @scrollFinished
+
 @scrollPositive
-        lda /1
-        cmp #/3
-        bne @finished
-        jsr /5
-@finished
+        inc flipScreenCounter
+        lda flipScreenCounter
+        cmp #2
+        bcc @finished
+        lda #1
+        sta flipScreenCounter
 
-        endm
-
-;===============================================================================
-
-flipScreen
-
+@scrollFinished
         lda screenOneActive
         beq @flipSecondary
 
 @flipPrimary
-        lda $D018
-        and #%00001111
-        ora #%10000000      ; set active screen RAM to SCREENRAMTWO/$2000
-        sta $D018
+        lda backgroundColumn
+        sta screenDebugZero
+
+        LIBSCREEN_SET_SECONDARY_SCREEN
+
         lda #1
         sta screenTwoActive
         lda #0
@@ -289,10 +334,11 @@ flipScreen
         jmp @finished
 
 @flipSecondary
-        lda $D018
-        and #%00001111
-        ora #%00010000      ; set active screen RAM to SCREENRAMONE/$0400
-        sta $D018
+        lda backgroundColumn
+        sta screenDebugOne
+
+        LIBSCREEN_SET_PRIMARY_SCREEN
+
         lda #0
         sta screenTwoActive
         lda #1
@@ -304,17 +350,66 @@ flipScreen
 
 ;===============================================================================
 
-flipScreenRight
+flipBackground
 
-        jsr flipScreen
+        lda ScreenScrollingRight
+        bne @scrollNegative
+        lda ScreenScrollingLeft
+        bne @scrollPositive
+        jmp @scrollFinished
+
+@scrollNegative
+        jsr flipBackgroundLeft
+        jmp @scrollFinished
+
+@scrollPositive
+        jsr flipBackgroundRight
+
+@scrollFinished
+        rts
+
+;===============================================================================
+
+flipScreenLeft
+
+        dec screenColumn
+        lda screenColumn
+        cmp #1
+        bcs @finished
+        lda #MapLastColumn
+        sta screenColumn
+
+@finished
+        rts
+
+;===============================================================================
+
+flipScreenRight
 
         inc screenColumn
         lda screenColumn
         cmp #MapLastColumn
-        bcc @screenColumnResetDone
+        bcc @finished
         lda #0
         sta screenColumn
-@screenColumnResetDone
+
+@finished
+        rts
+
+;===============================================================================
+
+flipBackgroundLeft
+
+        dec backgroundColumn
+        lda backgroundColumn
+        cmp #1
+        bcs @finished
+        lda #MapLastColumn
+        sta backgroundColumn
+
+@finished
+        sbc #1
+        sta backgroundScrollingColumn
 
         rts
 
@@ -330,34 +425,6 @@ flipBackgroundRight
         sta backgroundColumn
 
 @finished
-        rts
+        sta backgroundScrollingColumn
 
-;===============================================================================
-
-flipScreenLeft
-
-        jsr flipScreen
-
-        dec screenColumn
-        lda screenColumn
-        cmp #1
-        bcs @screenColumnResetDone
-        lda #MapLastColumn
-        sta screenColumn
-@screenColumnResetDone
-
-        rts
-
-;===============================================================================
-
-flipBackgroundLeft
-
-        dec backgroundColumn
-        lda backgroundColumn
-        cmp #1
-        bcs @finished
-        lda #MapLastColumn
-        sta backgroundColumn
-
-@finished
         rts

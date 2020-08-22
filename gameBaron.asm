@@ -182,7 +182,7 @@ gameBaronUpdateCollisions
         bcc @gBUCNoCollision
 
         ; if we have hit a non-terrain background character, no collision
-        LIBSCREEN_BACKGROUND_CHECK baronXChar, baronYChar
+        LIBSCREEN_BACKGROUND_CHECK_AA baronXChar, baronYChar
         cmp #0
         beq @gBUCNoCollision
 

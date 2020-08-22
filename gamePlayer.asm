@@ -221,7 +221,7 @@ gamePlayerUpdateCollisions
         bcc @gPUCNoCollision
 
         ; if we have hit a non-terrain background character, no collision
-        LIBSCREEN_BACKGROUND_CHECK playerXChar, playerYChar
+        LIBSCREEN_BACKGROUND_CHECK_AA playerXChar, playerYChar
         cmp #0
         beq @gPUCNoCollision
 
@@ -439,10 +439,6 @@ gPCXSNegative                   ; if negative velocity
         bne gPCXSDone
         lda #1
         sta screenScrolling
-        LIBSCREEN_FOREGROUNDSCROLLRIGHTTWO
-        LIBSCREEN_BACKGROUNDSCROLLRIGHTONE
-
-        lda #1
         sta ScreenScrollingRight
         jmp gPCXSDone
 
@@ -457,10 +453,6 @@ gPCXSPositive                    ; if positive velocity
         bcc gPCXSDone
         lda #1
         sta screenScrolling
-        LIBSCREEN_FOREGROUNDSCROLLLEFTTWO
-        LIBSCREEN_BACKGROUNDSCROLLLEFTONE
-
-        lda #1
         sta ScreenScrollingLeft
         
 gPCXSDone
