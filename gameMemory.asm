@@ -20,6 +20,8 @@ screenTwoActive    = $0B
 
 backgroundWriteColumn = $0C
 
+flipScreenCounter  = $0E
+
 ;===============================================================================
 ; use zero page for player variables to improve speed
 

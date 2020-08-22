@@ -62,6 +62,9 @@
         lda #0
         sta screenTwoActive
 
+        lda #1
+        sta flipScreenCounter
+
         ; set up raster interrupt
         lda #%01111111
         sta $DC0D
@@ -306,8 +309,16 @@ flipScreen
 
 flipScreenRight
 
+        inc flipScreenCounter
+        lda flipScreenCounter
+        cmp #2
+        bcc @flipDone
+        lda #1
+        sta flipScreenCounter
+
         jsr flipScreen
 
+@flipDone
         inc screenColumn
         lda screenColumn
         cmp #MapLastColumn
@@ -336,8 +347,16 @@ flipBackgroundRight
 
 flipScreenLeft
 
+        dec flipScreenCounter
+        lda flipScreenCounter
+        cmp #1
+        bcs @flipDone
+        lda #1
+        sta flipScreenCounter
+
         jsr flipScreen
 
+@flipDone
         dec screenColumn
         lda screenColumn
         cmp #1
